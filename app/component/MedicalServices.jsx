@@ -195,7 +195,7 @@ export default function MedicalServices() {
                       key={point}
                       className="flex items-start gap-2 text-sm text-[#123B50]"
                     >
-                      <span className="mt-[3px] flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-[#16587B]/10">
+                      <span className="mt-0.75 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-[#16587B]/10">
                         <Check
                           size={10}
                           strokeWidth={3}
@@ -213,7 +213,7 @@ export default function MedicalServices() {
               <div className="relative mt-7 border-t border-[#DCEAF1] pt-5">
                 <a
                   href="/appointment"
-                  className="inline-flex items-center text-sm font-semibold text-[#16587B] transition-colors duration-200 hover:text-[#A9002D]"
+                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#16587B] px-5 py-3.5 text-sm font-semibold text-white hover:bg-[#124B69]"
                 >
                   Book an Appointment
                   <ChevronRight
