@@ -126,13 +126,10 @@ export default function Hero() {
               {/* Doctor image */}
               <div className="relative flex min-h-[420px] items-end justify-center sm:min-h-[500px]">
 
-                {/* 
-                  Replace this image with your actual doctor/hero image.
-                  Put it inside /public as hero-doctor.png
-                */}
+                
 
                 <Image
-                  src="/hero-doctor.png"
+                  src="/unnamed.jpg"
                   alt="Doctor providing healthcare"
                   width={600}
                   height={650}

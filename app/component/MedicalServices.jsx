@@ -1,12 +1,31 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useRef } from "react";
-import { ChevronLeft, ChevronRight, Check } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Check,
+} from "lucide-react";
 
 const services = [
   {
     id: 1,
+    title: "Normal Delivery",
+    category: "Maternity Care",
+    image: "/services/normal-delivery.png",
+    description:
+      "Compassionate maternity care with dedicated support throughout pregnancy and delivery.",
+    points: [
+      "Pregnancy care",
+      "Normal delivery",
+      "Mother & baby care",
+      "Post-delivery support",
+    ],
+  },
+  {
+    id: 2,
     title: "General Medicine",
     category: "Medicine Center",
     image: "/services/general-medicine.png",
@@ -27,25 +46,7 @@ const services = [
       "Thyroid diseases",
       "Paralysis",
     ],
-   
   },
-
-  {
-    id: 2,
-     title: "Normal Delivery",
-    category: "Maternity Care",
-    image: "/services/normal-delivery.png",
-    description:
-      "Compassionate maternity care with dedicated support throughout pregnancy and delivery.",
-    points: [
-      "Pregnancy care",
-      "Normal delivery",
-      "Mother & baby care",
-      "Post-delivery support",
-    ],
-    
-  },
-
   {
     id: 3,
     title: "Women's Health",
@@ -75,31 +76,27 @@ const services = [
 export default function MedicalServices() {
   const sliderRef = useRef(null);
 
-  const scrollLeft = () => {
+  const moveSlider = (direction) => {
     if (!sliderRef.current) return;
 
-    sliderRef.current.scrollBy({
-      left: -sliderRef.current.clientWidth * 0.85,
-      behavior: "smooth",
-    });
-  };
+    const card = sliderRef.current.querySelector("article");
 
-  const scrollRight = () => {
-    if (!sliderRef.current) return;
+    if (!card) return;
+
+    const cardWidth = card.offsetWidth + 20;
 
     sliderRef.current.scrollBy({
-      left: sliderRef.current.clientWidth * 0.85,
+      left: direction === "left" ? -cardWidth : cardWidth,
       behavior: "smooth",
     });
   };
 
   return (
-    <section className="bg-white py-16 sm:py-20 lg:py-24">
+    <section className="overflow-hidden bg-[#F7FAFC] py-16 sm:py-20 lg:py-24">
       <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
 
-        {/* ================= HEADER ================= */}
+        {/* Header */}
         <div className="mb-10 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-
           <div className="max-w-2xl">
             <div className="mb-3 flex items-center gap-2">
               <span className="h-[2px] w-8 bg-[#A9002D]" />
@@ -121,29 +118,29 @@ export default function MedicalServices() {
             </p>
           </div>
 
-          {/* Slider Controls */}
+          {/* Slider Buttons */}
           <div className="flex gap-2">
             <button
               type="button"
-              onClick={scrollLeft}
-              aria-label="Previous services"
-              className="flex h-11 w-11 items-center justify-center rounded-full border border-[#DCEAF1] bg-white text-[#16587B] shadow-sm transition-all duration-200 hover:border-[#16587B] hover:bg-[#16587B] hover:text-white"
+              onClick={() => moveSlider("left")}
+              aria-label="Previous service"
+              className="flex h-11 w-11 items-center justify-center rounded-full border border-[#DCEAF1] bg-white text-[#16587B] shadow-sm transition hover:border-[#16587B] hover:bg-[#16587B] hover:text-white"
             >
               <ChevronLeft size={20} />
             </button>
 
             <button
               type="button"
-              onClick={scrollRight}
-              aria-label="Next services"
-              className="flex h-11 w-11 items-center justify-center rounded-full border border-[#DCEAF1] bg-white text-[#16587B] shadow-sm transition-all duration-200 hover:border-[#16587B] hover:bg-[#16587B] hover:text-white"
+              onClick={() => moveSlider("right")}
+              aria-label="Next service"
+              className="flex h-11 w-11 items-center justify-center rounded-full border border-[#DCEAF1] bg-white text-[#16587B] shadow-sm transition hover:border-[#16587B] hover:bg-[#16587B] hover:text-white"
             >
               <ChevronRight size={20} />
             </button>
           </div>
         </div>
 
-        {/* ================= SERVICE SLIDER ================= */}
+        {/* Services Slider */}
         <div
           ref={sliderRef}
           className="flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth pb-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
@@ -151,12 +148,12 @@ export default function MedicalServices() {
           {services.map((service) => (
             <article
               key={service.id}
-              className="group relative min-w-[88%] snap-start overflow-hidden rounded-3xl border border-[#DCEAF1] bg-[#F7FAFC] p-6 transition-all duration-300 hover:-translate-y-1 hover:border-[#84B3CE] hover:shadow-xl sm:min-w-[55%] lg:min-w-[calc(33.333%-14px)]"
+              className="group relative min-w-[88%] snap-start overflow-hidden rounded-3xl border border-[#DCEAF1] bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:border-[#84B3CE] hover:shadow-xl sm:min-w-[55%] lg:min-w-[calc(33.333%-14px)]"
             >
-              {/* Decorative Circle */}
-              <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-[#84B3CE]/10 transition-colors duration-300 group-hover:bg-[#84B3CE]/20" />
+              {/* Decoration */}
+              <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-[#84B3CE]/10 transition group-hover:bg-[#84B3CE]/20" />
 
-              {/* Service Image */}
+              {/* Service Icon */}
               <div className="relative mb-6 flex items-center justify-between">
                 <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#16587B]/10 p-2">
                   <Image
@@ -168,7 +165,7 @@ export default function MedicalServices() {
                   />
                 </div>
 
-                <span className="rounded-full bg-white px-3 py-1.5 text-[11px] font-semibold text-[#16587B] shadow-sm">
+                <span className="rounded-full bg-[#F7FAFC] px-3 py-1.5 text-[11px] font-semibold text-[#16587B] shadow-sm">
                   {service.category}
                 </span>
               </div>
@@ -183,7 +180,7 @@ export default function MedicalServices() {
                 {service.description}
               </p>
 
-              {/* Service List */}
+              {/* Conditions */}
               <div className="relative mt-6 border-t border-[#DCEAF1] pt-5">
                 <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-[#84B3CE]">
                   Services & Conditions
@@ -195,7 +192,7 @@ export default function MedicalServices() {
                       key={point}
                       className="flex items-start gap-2 text-sm text-[#123B50]"
                     >
-                      <span className="mt-0.75 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-[#16587B]/10">
+                      <span className="mt-[3px] flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-[#16587B]/10">
                         <Check
                           size={10}
                           strokeWidth={3}
@@ -211,16 +208,16 @@ export default function MedicalServices() {
 
               {/* Appointment */}
               <div className="relative mt-7 border-t border-[#DCEAF1] pt-5">
-                <a
+                <Link
                   href="/appointment"
-                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#16587B] px-5 py-3.5 text-sm font-semibold text-white hover:bg-[#124B69]"
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#16587B] px-5 py-3.5 text-sm font-semibold text-white hover:bg-[#124B69]"
                 >
                   Book an Appointment
                   <ChevronRight
                     size={17}
-                    className="ml-1 transition-transform duration-200 group-hover:translate-x-1"
+                    className="ml-1 transition-transform group-hover:translate-x-1"
                   />
-                </a>
+                </Link>
               </div>
             </article>
           ))}
