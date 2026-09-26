@@ -95,7 +95,7 @@ function Navbar() {
           className="flex items-center"
         >
           <img
-            src="/logo1.png"
+            src="/logo.png"
             alt="City Hospital"
             className="h-12 w-auto object-contain"
           />

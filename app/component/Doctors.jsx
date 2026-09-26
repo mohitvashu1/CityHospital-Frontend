@@ -30,7 +30,7 @@ const doctors = [
     experience: "Infertility & Women's Health",
     image: "/doctors/dr-rashmi-rai.png",
     description:
-      "Focused on women's health, pregnancy care, gynecology and fertility-related treatments.",
+      "Dr Rashmi Rai is a well-known Obstetrician Gynaecologist, She has 10 years of experience in Obstetrics and Gynaecology and worked as an expert Obstetrician Gynaecologist in different cities of India.",
   },
   {
     id: 3,

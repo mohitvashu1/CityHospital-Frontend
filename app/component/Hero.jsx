@@ -124,7 +124,7 @@ export default function Hero() {
               <div className="absolute -right-16 -top-16 h-56 w-56 rounded-full bg-[#84B3CE]/30" />
 
               {/* Doctor image */}
-              <div className="relative flex min-h-[420px] items-end justify-center sm:min-h-[500px]">
+              <div className="relative flex min-h-[300px] items-end justify-center sm:min-h-[500px]">
 
                 
 
@@ -132,7 +132,7 @@ export default function Hero() {
                   src="/unnamed.jpg"
                   alt="Doctor providing healthcare"
                   width={600}
-                  height={650}
+                  height={700}
                   priority
                   sizes="(max-width: 1024px) 90vw, 560px"
                   className="relative z-10 h-auto w-full object-contain"
