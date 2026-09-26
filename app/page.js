@@ -1,6 +1,7 @@
 import Doctors from "./component/Doctors";
 import Hero from "./component/Hero";
 import MedicalServices from "./component/MedicalServices";
+import QuickInfo from "./component/QuickInfo";
 
 
 export default function Home() {
@@ -9,6 +10,7 @@ export default function Home() {
       <Hero />
       <Doctors/>
       <MedicalServices/>
+      <QuickInfo/>
       
 
     </main>

@@ -3,11 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRef } from "react";
-import {
-  ChevronLeft,
-  ChevronRight,
-  Check,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, Check } from "lucide-react";
 
 const services = [
   {
@@ -71,6 +67,76 @@ const services = [
       "IUI fertility treatment",
     ],
   },
+  {
+    id: 4,
+    title: "ICU / Critical Care",
+    category: "Critical Care",
+    image: "/services/general-medicine.png",
+    description:
+      "Specialized medical attention and monitoring for patients requiring critical care.",
+    points: [
+      "Critical patient monitoring",
+      "Emergency medical care",
+      "Intensive observation",
+      "Supportive treatment",
+    ],
+  },
+  {
+    id: 5,
+    title: "Heart Care",
+    category: "Cardiac Care",
+    image: "/services/general-medicine.png",
+    description:
+      "Medical care for common heart-related conditions and cardiovascular health.",
+    points: [
+      "Heart diseases",
+      "Heart attack",
+      "Heart failure",
+      "Blood pressure",
+    ],
+  },
+  {
+    id: 6,
+    title: "Gastroenterology",
+    category: "Digestive Health",
+    image: "/services/general-medicine.png",
+    description:
+      "Care for digestive, liver and gastrointestinal health conditions.",
+    points: [
+      "Gastroenterology",
+      "Liver diseases",
+      "Digestive diseases",
+      "Jaundice",
+    ],
+  },
+  {
+    id: 7,
+    title: "Diabetes Care",
+    category: "Diabetes Management",
+    image: "/services/general-medicine.png",
+    description:
+      "Comprehensive support for diabetes management and long-term health.",
+    points: [
+      "Diabetes management",
+      "Regular monitoring",
+      "Diet guidance",
+      "Long-term care",
+    ],
+  },
+  {
+    id: 8,
+    title: "Urology & Kidney Care",
+    category: "Urology",
+    image: "/services/general-medicine.png",
+    description:
+      "Medical consultation and care for urinary and kidney-related conditions.",
+    points: [
+      "Urology conditions",
+      "Kidney diseases",
+      "Urinary conditions",
+      "Medical consultation",
+    ],
+  },
 ];
 
 export default function MedicalServices() {
@@ -79,156 +145,157 @@ export default function MedicalServices() {
   const moveSlider = (direction) => {
     if (!sliderRef.current) return;
 
-    const card = sliderRef.current.querySelector("article");
+    const slider = sliderRef.current;
+    const card = slider.querySelector("article");
 
     if (!card) return;
 
-    const cardWidth = card.offsetWidth + 20;
+    const gap = 20;
+    const cardWidth = card.offsetWidth + gap;
 
-    sliderRef.current.scrollBy({
+    slider.scrollBy({
       left: direction === "left" ? -cardWidth : cardWidth,
       behavior: "smooth",
     });
   };
 
   return (
-    <section className="overflow-hidden bg-[#F7FAFC] py-16 sm:py-20 lg:py-24">
+    <section className="overflow-hidden bg-[#F7FAFC] py-12 sm:py-16 lg:py-20">
       <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
 
-        {/* Header */}
-        <div className="mb-10 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-          <div className="max-w-2xl">
-            <div className="mb-3 flex items-center gap-2">
-              <span className="h-[2px] w-8 bg-[#A9002D]" />
+        {/* Section Header */}
+        <div className="mb-8">
+          <div className="mb-2 flex items-center gap-2">
+            <span className="h-[2px] w-7 bg-[#A9002D]" />
 
-              <span className="text-sm font-semibold uppercase tracking-[0.15em] text-[#16587B]">
-                Our Medical Services
-              </span>
-            </div>
-
-            <h2 className="text-3xl font-bold leading-tight tracking-tight text-[#123B50] sm:text-4xl lg:text-[42px]">
-              Complete Care For{" "}
-              <span className="text-[#16587B]">Your Health</span>
-            </h2>
-
-            <p className="mt-4 max-w-xl text-sm leading-7 text-slate-600 sm:text-base">
-              Our hospital provides comprehensive medical care with
-              experienced healthcare professionals and patient-focused
-              treatment.
-            </p>
+            <span className="text-xs font-semibold uppercase tracking-[0.15em] text-[#16587B]">
+              Our Medical Specialties
+            </span>
           </div>
 
-          {/* Slider Buttons */}
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => moveSlider("left")}
-              aria-label="Previous service"
-              className="flex h-11 w-11 items-center justify-center rounded-full border border-[#DCEAF1] bg-white text-[#16587B] shadow-sm transition hover:border-[#16587B] hover:bg-[#16587B] hover:text-white"
-            >
-              <ChevronLeft size={20} />
-            </button>
+          <h2 className="text-3xl font-bold leading-tight tracking-tight text-[#123B50] sm:text-4xl">
+            Complete Care For{" "}
+            <span className="text-[#16587B]">Your Health</span>
+          </h2>
 
-            <button
-              type="button"
-              onClick={() => moveSlider("right")}
-              aria-label="Next service"
-              className="flex h-11 w-11 items-center justify-center rounded-full border border-[#DCEAF1] bg-white text-[#16587B] shadow-sm transition hover:border-[#16587B] hover:bg-[#16587B] hover:text-white"
-            >
-              <ChevronRight size={20} />
-            </button>
-          </div>
+          <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">
+            Our hospital provides comprehensive medical care with experienced
+            healthcare professionals and patient-focused treatment.
+          </p>
         </div>
 
-        {/* Services Slider */}
-        <div
-          ref={sliderRef}
-          className="flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth pb-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        >
-          {services.map((service) => (
-            <article
-              key={service.id}
-              className="group relative min-w-[88%] snap-start overflow-hidden rounded-3xl border border-[#DCEAF1] bg-white p-6 transition-all duration-300 hover:-translate-y-1 hover:border-[#84B3CE] hover:shadow-xl sm:min-w-[55%] lg:min-w-[calc(33.333%-14px)]"
-            >
-              {/* Decoration */}
-              <div className="pointer-events-none absolute -right-10 -top-10 h-32 w-32 rounded-full bg-[#84B3CE]/10 transition group-hover:bg-[#84B3CE]/20" />
+        {/* Slider Wrapper */}
+        <div className="relative">
 
-              {/* Service Icon */}
-              <div className="relative mb-6 flex items-center justify-between">
-                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#16587B]/10 p-2">
-                  <Image
-                    src={service.image}
-                    alt={service.title}
-                    width={512}
-                    height={512}
-                    className="h-12 w-12 object-contain"
-                  />
+          {/* Left Arrow */}
+          <button
+            type="button"
+            onClick={() => moveSlider("left")}
+            aria-label="Previous specialty"
+            className="absolute left-0 top-1/2 z-30 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-[#DCEAF1] bg-white text-[#16587B] shadow-lg transition-all duration-200 hover:border-[#16587B] hover:bg-[#16587B] hover:text-white sm:left-1 lg:-left-5"
+          >
+            <ChevronLeft size={20} />
+          </button>
+
+          {/* Right Arrow */}
+          <button
+            type="button"
+            onClick={() => moveSlider("right")}
+            aria-label="Next specialty"
+            className="absolute right-0 top-1/2 z-30 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-[#DCEAF1] bg-white text-[#16587B] shadow-lg transition-all duration-200 hover:border-[#16587B] hover:bg-[#16587B] hover:text-white sm:right-1 lg:-right-5"
+          >
+            <ChevronRight size={20} />
+          </button>
+
+          {/* Cards Slider */}
+          <div
+            ref={sliderRef}
+            className="flex snap-x snap-mandatory gap-5 overflow-x-auto scroll-smooth px-7 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:px-8 lg:px-0"
+          >
+            {services.map((service) => (
+              <article
+                key={service.id}
+                className="group relative min-w-[86%] snap-start overflow-hidden rounded-2xl border border-[#DCEAF1] bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-[#84B3CE] hover:shadow-lg sm:min-w-[48%] lg:min-w-[calc((100%-40px)/3)]"
+              >
+                {/* Decorative Circle */}
+                <div className="pointer-events-none absolute -right-8 -top-8 h-24 w-24 rounded-full bg-[#84B3CE]/10 transition group-hover:bg-[#84B3CE]/20" />
+
+                {/* Icon + Category */}
+                <div className="relative mb-4 flex items-center justify-between">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-[#16587B]/10 p-2">
+                    <Image
+                      src={service.image}
+                      alt={service.title}
+                      width={512}
+                      height={512}
+                      className="h-10 w-10 object-contain"
+                    />
+                  </div>
+
+                  <span className="max-w-[150px] truncate rounded-full bg-[#F7FAFC] px-3 py-1 text-[10px] font-semibold text-[#16587B] shadow-sm">
+                    {service.category}
+                  </span>
                 </div>
 
-                <span className="rounded-full bg-[#F7FAFC] px-3 py-1.5 text-[11px] font-semibold text-[#16587B] shadow-sm">
-                  {service.category}
-                </span>
-              </div>
+                {/* Title */}
+                <h3 className="relative min-h-[28px] text-xl font-bold text-[#123B50]">
+                  {service.title}
+                </h3>
 
-              {/* Title */}
-              <h3 className="relative text-2xl font-bold text-[#123B50]">
-                {service.title}
-              </h3>
-
-              {/* Description */}
-              <p className="relative mt-3 text-sm leading-6 text-slate-600">
-                {service.description}
-              </p>
-
-              {/* Conditions */}
-              <div className="relative mt-6 border-t border-[#DCEAF1] pt-5">
-                <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-[#84B3CE]">
-                  Services & Conditions
+                {/* Description */}
+                <p className="relative mt-2 line-clamp-2 min-h-[40px] text-sm leading-5 text-slate-600">
+                  {service.description}
                 </p>
 
-                <div className="grid gap-2.5">
-                  {service.points.map((point) => (
-                    <div
-                      key={point}
-                      className="flex items-start gap-2 text-sm text-[#123B50]"
-                    >
-                      <span className="mt-[3px] flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-[#16587B]/10">
-                        <Check
-                          size={10}
-                          strokeWidth={3}
-                          className="text-[#16587B]"
-                        />
-                      </span>
+                {/* Highlights */}
+                <div className="relative mt-4 border-t border-[#DCEAF1] pt-4">
+                  <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-[#84B3CE]">
+                    Key Highlights
+                  </p>
 
-                      <span>{point}</span>
-                    </div>
-                  ))}
+                  <div className="grid gap-2">
+                    {service.points.slice(0, 5).map((point) => (
+                      <div
+                        key={point}
+                        className="flex items-start gap-2 text-sm text-[#123B50]"
+                      >
+                        <span className="mt-[2px] flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-[#16587B]/10">
+                          <Check
+                            size={9}
+                            strokeWidth={3}
+                            className="text-[#16587B]"
+                          />
+                        </span>
+
+                        <span className="line-clamp-1">{point}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
 
-              {/* Appointment */}
-              <div className="relative mt-7 border-t border-[#DCEAF1] pt-5">
-                <Link
-                  href="/appointment"
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#16587B] px-5 py-3.5 text-sm font-semibold text-white hover:bg-[#124B69]"
-                >
-                  Book an Appointment
-                  <ChevronRight
-                    size={17}
-                    className="ml-1 transition-transform group-hover:translate-x-1"
-                  />
-                </Link>
-              </div>
-            </article>
-          ))}
+                {/* Appointment Button */}
+                <div className="relative mt-5 border-t border-[#DCEAF1] pt-4">
+                  <Link
+                    href="/appointment"
+                    className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#16587B] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#124B69]"
+                  >
+                    Book Appointment
+                    <ChevronRight size={15} />
+                  </Link>
+                </div>
+              </article>
+            ))}
+          </div>
         </div>
 
-        {/* Mobile Hint */}
-        <div className="mt-3 flex items-center justify-center gap-2 text-xs text-slate-400 sm:hidden">
-          <ChevronLeft size={14} />
+        {/* Mobile Swipe Hint */}
+        <div className="mt-2 flex items-center justify-center gap-2 text-xs text-slate-400 lg:hidden">
+          <ChevronLeft size={13} />
           Swipe to explore
-          <ChevronRight size={14} />
+          <ChevronRight size={13} />
         </div>
+
+        
       </div>
     </section>
   );

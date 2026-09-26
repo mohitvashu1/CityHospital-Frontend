@@ -97,7 +97,7 @@ function Navbar() {
           <img
             src="/logo.png"
             alt="City Hospital"
-            className="h-12 w-auto object-contain"
+            className="h-12 sm:h-16 w-auto object-contain"
           />
         </Link>
 
