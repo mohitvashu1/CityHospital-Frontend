@@ -166,7 +166,7 @@ export default function GoogleReviews() {
 
     resumeTimer.current = setTimeout(() => {
       setIsPaused(false);
-    }, 4000);
+    }, 3000);
   };
 
   const previousReview = () => {
@@ -182,7 +182,7 @@ export default function GoogleReviews() {
 
     const timer = setTimeout(() => {
       setActiveIndex((current) => (current + 1) % reviews.length);
-    }, 4000);
+    }, 3000);
 
     return () => clearTimeout(timer);
   }, [activeIndex, isPaused]);
@@ -195,9 +195,11 @@ export default function GoogleReviews() {
     <section className="bg-[#f7fafc] px-4 py-14 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl">
         <div className="mx-auto mb-8 max-w-2xl text-center">
+            <span className="h-[2px] w-8 bg-[#A9002D]" />
           <span className="text-sm font-semibold uppercase tracking-[0.18em] text-[#16587b]">
             Patient Testimonials
           </span>
+          <span className="h-[2px] w-8 bg-[#A9002D]" /> 
 
           <h2 className="mt-2 text-3xl font-bold text-[#123b50] sm:text-4xl">
             What Our Patients Say
@@ -209,6 +211,7 @@ export default function GoogleReviews() {
 
           <div className="mt-4 flex items-center justify-center gap-2">
             <span className="font-semibold text-[#202124]">Google</span>
+            <span>4.9</span>
             <span className="flex items-center gap-0.5 text-[#fbbc04]">
               {Array.from({ length: 5 }).map((_, index) => (
                 <Star
@@ -219,6 +222,7 @@ export default function GoogleReviews() {
                 />
               ))}
             </span>
+            <span> 75 Reviews</span>
           </div>
         </div>
 
@@ -289,7 +293,7 @@ export default function GoogleReviews() {
             href={googleReviewsUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-[#16587b] px-6 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-[#104662]"
+            className="inline-flex items-center justify-center gap-2 rounded-full border border-[#16587B] px-5 py-2.5 font-medium text-[#16587B] transition-all duration-200 hover:bg-[#16587B] hover:text-white"
           >
             Read All Reviews on Google
             <ExternalLink size={16} />

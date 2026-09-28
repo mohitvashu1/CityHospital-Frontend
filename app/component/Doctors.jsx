@@ -17,7 +17,7 @@ const doctors = [
     qualification: "M.B.B.S., M.D. (General Medicine), CPCDM",
     specialty: "General Medicine",
     experience: "Experienced Physician",
-    image: "/doctors/dr-pc-rai.png",
+    image: "/doctors/dr-pc-rai1.png",
     description:
       "Providing comprehensive medical care with a focus on diagnosis, treatment and long-term health management.",
   },
@@ -28,7 +28,7 @@ const doctors = [
       "M.S. (Obstetrics & Gynecology), Infertility Specialist",
     specialty: "Obstetrics & Gynecology",
     experience: "Infertility & Women's Health",
-    image: "/doctors/dr-rashmi-rai.png",
+    image: "/doctors/dr-rashmi-rai.jpeg",
     description:
       "Dr Rashmi Rai is a well-known Obstetrician Gynaecologist, She has 10 years of experience in Obstetrics and Gynaecology and worked as an expert Obstetrician Gynaecologist in different cities of India.",
   },
