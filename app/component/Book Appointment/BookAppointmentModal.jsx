@@ -218,14 +218,14 @@ export default function BookAppointmentModal({ isOpen, onClose }) {
   };
 
   const inputClass =
-    "w-full rounded-xl border border-[#dceaf1] bg-white px-4 py-3 text-sm text-[#123b50] outline-none transition placeholder:text-[#8aa3b1] focus:border-[#16587b] focus:ring-2 focus:ring-[#dceaf1]";
+    "w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none transition placeholder:text-gray-400 focus:border-[#16587b] focus:ring-2 focus:ring-[#e4f1f7]";
 
   const labelClass =
-    "mb-2 block text-sm font-semibold text-[#34586a]";
+    "mb-2 block text-sm font-semibold text-gray-700";
 
   return (
     <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center overflow-y-auto bg-slate-950/60 p-3 backdrop-blur-sm sm:p-5"
+      className="fixed inset-0 z-[9999] flex items-center justify-center overflow-y-auto bg-[#092c40]/75 p-3 backdrop-blur-md sm:p-5"
       onMouseDown={(e) => {
         if (e.target === e.currentTarget) handleClose();
       }}
@@ -234,10 +234,30 @@ export default function BookAppointmentModal({ isOpen, onClose }) {
         role="dialog"
         aria-modal="true"
         aria-labelledby="appointment-title"
-        className="relative my-auto max-h-[94vh] w-full max-w-xl overflow-y-auto rounded-2xl border border-[#dceaf1] bg-white shadow-[0_24px_80px_rgba(18,59,80,0.22)] sm:rounded-3xl"
+        className="relative my-auto flex max-h-[94vh] w-full max-w-5xl overflow-hidden rounded-[28px] border border-white/70 bg-white shadow-[0_30px_100px_-25px_rgba(8,47,73,0.45)]"
       >
+        <aside className="relative hidden w-[34%] shrink-0 flex-col justify-between overflow-hidden bg-[#16587b] p-8 text-white md:flex lg:p-10">
+          <div className="absolute -right-24 -top-20 h-72 w-72 rounded-full border-[38px] border-white/[0.06]" />
+          <div className="absolute -bottom-24 -left-20 h-72 w-72 rounded-full border-[38px] border-white/[0.06]" />
+          <div className="relative z-10">
+            <div className="mb-9 flex h-16 w-16 items-center justify-center rounded-2xl bg-white p-2 shadow-lg shadow-slate-950/10">
+              <img src="/logo1.png" alt="City Hospital logo" className="h-full w-full object-contain" />
+            </div>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#b9d8e8]">City Hospital · Buxar</p>
+            <h2 className="mt-4 text-3xl font-bold leading-tight lg:text-[2.5rem]">Care that feels closer.</h2>
+            <p className="mt-4 max-w-xs text-sm leading-7 text-blue-50/85">Book your consultation in a few simple steps. Our team is here to help you plan your visit.</p>
+            <div className="mt-9 h-1 w-14 rounded-full bg-[#a9002d]" />
+            <div className="mt-8 space-y-5 text-sm text-blue-50/90">
+              <div className="flex items-start gap-3"><span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/10 text-xs font-bold">01</span><span><strong className="block font-semibold text-white">Patient details</strong><span className="mt-1 block text-blue-100/75">Login or create your profile</span></span></div>
+              <div className="flex items-start gap-3"><span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/10 text-xs font-bold">02</span><span><strong className="block font-semibold text-white">Choose consultation</strong><span className="mt-1 block text-blue-100/75">Select doctor, date and time</span></span></div>
+              <div className="flex items-start gap-3"><span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/10 text-xs font-bold">03</span><span><strong className="block font-semibold text-white">Review booking</strong><span className="mt-1 block text-blue-100/75">Confirm your appointment details</span></span></div>
+            </div>
+          </div>
+          <div className="relative z-10 mt-10 border-t border-white/15 pt-5 text-xs leading-5 text-blue-100/70">Your health, our priority.<br />Near Hindustan Machinery, Golumber, Buxar</div>
+        </aside>
+        <div className="min-w-0 flex-1 overflow-y-auto bg-[#fbfdfe]">
         {/* HEADER */}
-        <div className="sticky top-0 z-20 flex items-center justify-between border-b border-white/15 bg-[#16587b] px-5 py-4 text-white sm:px-7 sm:py-5">
+        <div className="sticky top-0 z-20 flex items-center justify-between border-b border-[#dceaf1] bg-white/95 px-5 py-4 backdrop-blur-md sm:px-8 sm:py-5">
           <div className="flex items-center gap-3">
             {step !== "main" && step !== "success" && (
               <button
@@ -249,7 +269,7 @@ export default function BookAppointmentModal({ isOpen, onClose }) {
                     changeStep("main");
                   }
                 }}
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20 hover:text-white"
+                className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-gray-600 transition hover:bg-[#edf6fa] hover:text-[#16587b]"
                 aria-label="Go back"
               >
                 <ArrowLeft size={18} />
@@ -259,7 +279,7 @@ export default function BookAppointmentModal({ isOpen, onClose }) {
             <div>
               <h2
                 id="appointment-title"
-                className="text-xl font-bold tracking-tight text-white sm:text-2xl"
+                className="text-xl font-bold text-gray-900 sm:text-2xl"
               >
                 {step === "main" && "Book Appointment"}
                 {step === "login" && "Patient Login"}
@@ -267,7 +287,7 @@ export default function BookAppointmentModal({ isOpen, onClose }) {
                 {step === "appointment" && "Appointment Details"}
                 {step === "success" && "Appointment Confirmed"}
               </h2>
-              <p className="mt-1 text-xs text-white/75 sm:text-sm">
+              <p className="mt-1 text-xs text-gray-500 sm:text-sm">
                 {step === "main" && "Your health, our priority."}
                 {step === "login" && "Verify your registered account."}
                 {step === "register" && "Create your patient profile."}
@@ -281,24 +301,24 @@ export default function BookAppointmentModal({ isOpen, onClose }) {
             type="button"
             onClick={handleClose}
             aria-label="Close modal"
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-white/80 transition hover:bg-[#a9002d] hover:text-white"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-gray-500 transition hover:bg-red-50 hover:text-red-500"
           >
             <X size={21} />
           </button>
         </div>
 
-        <div className="p-5 sm:p-7">
+        <div className="p-5 sm:p-8 lg:p-9">
           {/* MAIN CHOICE */}
           {step === "main" && (
             <div className="space-y-4">
-              <div className="mb-6 rounded-2xl border border-[#dceaf1] bg-gradient-to-br from-[#edf6fa] to-white p-5 sm:p-6">
+              <div className="mb-6 rounded-2xl border border-[#d4e7f0] bg-[#edf6fa] p-5">
                 <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-[#16587b] text-white">
                   <CalendarDays size={24} />
                 </div>
-                <h3 className="text-lg font-bold text-[#123b50]">
+                <h3 className="text-lg font-bold text-gray-900">
                   Schedule your visit
                 </h3>
-                <p className="mt-1 text-sm leading-6 text-[#527184]">
+                <p className="mt-1 text-sm leading-6 text-gray-600">
                   Continue with your existing patient account or
                   register as a new patient.
                 </p>
@@ -307,20 +327,20 @@ export default function BookAppointmentModal({ isOpen, onClose }) {
               <button
                 type="button"
                 onClick={() => changeStep("login")}
-                className="group flex w-full items-center gap-4 rounded-2xl border border-[#dceaf1] p-4 text-left transition hover:border-[#16587b] hover:bg-[#edf6fa]/60"
+                className="group flex w-full items-center gap-4 rounded-2xl border border-gray-200 p-4 text-left transition hover:border-[#16587b] hover:bg-[#edf6fa]/60"
               >
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#dceaf1] text-[#16587b]">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#e2f0f7] text-[#16587b]">
                   <UserRound size={23} />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <h3 className="font-bold text-[#123b50]">
+                  <h3 className="font-bold text-gray-900">
                     Already Registered?
                   </h3>
-                  <p className="mt-1 text-xs leading-5 text-[#668293] sm:text-sm">
+                  <p className="mt-1 text-xs leading-5 text-gray-500 sm:text-sm">
                     Login with your mobile and Aadhaar number.
                   </p>
                 </div>
-                <span className="text-xl text-[#8aa3b1] transition group-hover:translate-x-1 group-hover:text-[#16587b]">
+                <span className="text-xl text-gray-400 transition group-hover:translate-x-1 group-hover:text-[#16587b]">
                   →
                 </span>
               </button>
@@ -328,25 +348,25 @@ export default function BookAppointmentModal({ isOpen, onClose }) {
               <button
                 type="button"
                 onClick={() => changeStep("register")}
-                className="group flex w-full items-center gap-4 rounded-2xl border border-[#dceaf1] p-4 text-left transition hover:border-[#16587b] hover:bg-[#edf6fa]/60"
+                className="group flex w-full items-center gap-4 rounded-2xl border border-gray-200 p-4 text-left transition hover:border-[#16587b] hover:bg-[#edf6fa]/60"
               >
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#dceaf1] text-[#16587b]">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#e2f0f7] text-[#16587b]">
                   <UserPlus size={23} />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <h3 className="font-bold text-[#123b50]">
+                  <h3 className="font-bold text-gray-900">
                     New Patient?
                   </h3>
-                  <p className="mt-1 text-xs leading-5 text-[#668293] sm:text-sm">
+                  <p className="mt-1 text-xs leading-5 text-gray-500 sm:text-sm">
                     Register your details and book an appointment.
                   </p>
                 </div>
-                <span className="text-xl text-[#8aa3b1] transition group-hover:translate-x-1 group-hover:text-[#16587b]">
+                <span className="text-xl text-gray-400 transition group-hover:translate-x-1 group-hover:text-[#16587b]">
                   →
                 </span>
               </button>
 
-              <p className="pt-2 text-center text-xs text-[#8aa3b1]">
+              <p className="pt-2 text-center text-xs text-gray-400">
                 Demo frontend only. Real authentication will be
                 connected later.
               </p>
@@ -356,9 +376,9 @@ export default function BookAppointmentModal({ isOpen, onClose }) {
           {/* REGISTERED PATIENT LOGIN */}
           {step === "login" && (
             <form onSubmit={handleLogin} className="space-y-5">
-              <div className="flex gap-3 rounded-xl border border-[#dceaf1] bg-[#edf6fa] p-4">
+              <div className="flex gap-3 rounded-xl border border-[#d4e7f0] bg-[#edf6fa] p-4">
                 <ShieldCheck className="mt-0.5 shrink-0 text-[#16587b]" size={22} />
-                <p className="text-sm leading-6 text-[#123b50]">
+                <p className="text-sm leading-6 text-[#104662]">
                   Enter the details associated with your registered
                   patient profile.
                 </p>
@@ -366,8 +386,8 @@ export default function BookAppointmentModal({ isOpen, onClose }) {
 
               <div>
                 <label className={labelClass}>Mobile Number</label>
-                <div className="flex overflow-hidden rounded-xl border border-[#dceaf1] focus-within:border-[#16587b] focus-within:ring-2 focus-within:ring-[#dceaf1]">
-                  <span className="flex items-center border-r border-[#dceaf1] bg-[#f7fafc] px-4 text-sm font-medium text-[#527184]">
+                <div className="flex overflow-hidden rounded-xl border border-gray-200 focus-within:border-[#16587b] focus-within:ring-2 focus-within:ring-blue-100">
+                  <span className="flex items-center border-r border-gray-200 bg-gray-50 px-4 text-sm font-medium text-gray-600">
                     +91
                   </span>
                   <input
@@ -401,33 +421,33 @@ export default function BookAppointmentModal({ isOpen, onClose }) {
                   className={inputClass}
                   required
                 />
-                <p className="mt-2 text-xs leading-5 text-[#8aa3b1]">
+                <p className="mt-2 text-xs leading-5 text-gray-400">
                   Use fictional demo details only. Never enter your
                   real Aadhaar number in this prototype.
                 </p>
               </div>
 
               {error && (
-                <p role="alert" className="rounded-xl bg-[#fff1f2] p-3 text-sm text-[#a9002d]">
+                <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm text-red-600">
                   {error}
                 </p>
               )}
 
               <button
                 type="submit"
-                className="w-full rounded-xl bg-[#16587b] px-5 py-3.5 font-semibold text-white shadow-lg shadow-[#16587b]/15 transition hover:bg-[#104662] active:scale-[0.99]"
+                className="w-full rounded-xl bg-[#16587b] px-5 py-3.5 font-semibold text-white transition hover:bg-[#104662] active:scale-[0.99]"
               >
                 Verify & Continue
               </button>
 
-              <div className="rounded-xl border border-dashed border-[#dceaf1] bg-[#f7fafc] p-4">
-                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-[#668293]">
+              <div className="rounded-xl border border-dashed border-gray-200 bg-gray-50 p-4">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
                   Demo login credentials
                 </p>
-                <p className="text-sm text-[#34586a]">
+                <p className="text-sm text-gray-700">
                   Mobile: <strong>9876543210</strong>
                 </p>
-                <p className="mt-1 text-sm text-[#34586a]">
+                <p className="mt-1 text-sm text-gray-700">
                   Aadhaar: <strong>123456789012</strong>
                 </p>
                 <button
@@ -443,7 +463,7 @@ export default function BookAppointmentModal({ isOpen, onClose }) {
                 </button>
               </div>
 
-              <p className="text-center text-sm text-[#668293]">
+              <p className="text-center text-sm text-gray-500">
                 New patient?{" "}
                 <button
                   type="button"
@@ -474,8 +494,8 @@ export default function BookAppointmentModal({ isOpen, onClose }) {
 
               <div>
                 <label className={labelClass}>Mobile Number</label>
-                <div className="flex overflow-hidden rounded-xl border border-[#dceaf1] focus-within:border-[#16587b] focus-within:ring-2 focus-within:ring-[#dceaf1]">
-                  <span className="flex items-center border-r border-[#dceaf1] bg-[#f7fafc] px-4 text-sm text-[#527184]">
+                <div className="flex overflow-hidden rounded-xl border border-gray-200 focus-within:border-[#16587b] focus-within:ring-2 focus-within:ring-blue-100">
+                  <span className="flex items-center border-r border-gray-200 bg-gray-50 px-4 text-sm text-gray-600">
                     +91
                   </span>
                   <input
@@ -514,7 +534,7 @@ export default function BookAppointmentModal({ isOpen, onClose }) {
                   className={inputClass}
                   required
                 />
-                <p className="mt-1 text-xs text-[#8aa3b1]">
+                <p className="mt-1 text-xs text-gray-400">
                   Use fictional data only in this demo.
                 </p>
               </div>
@@ -552,19 +572,19 @@ export default function BookAppointmentModal({ isOpen, onClose }) {
               </div>
 
               {error && (
-                <p role="alert" className="rounded-xl bg-[#fff1f2] p-3 text-sm text-[#a9002d]">
+                <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm text-red-600">
                   {error}
                 </p>
               )}
 
               <button
                 type="submit"
-                className="w-full rounded-xl bg-[#16587b] px-5 py-3.5 font-semibold text-white shadow-lg shadow-[#16587b]/15 transition hover:bg-[#104662]"
+                className="w-full rounded-xl bg-[#16587b] px-5 py-3.5 font-semibold text-white transition hover:bg-[#104662]"
               >
                 Register & Continue
               </button>
 
-              <p className="text-center text-sm text-[#668293]">
+              <p className="text-center text-sm text-gray-500">
                 Already registered?{" "}
                 <button
                   type="button"
@@ -580,18 +600,18 @@ export default function BookAppointmentModal({ isOpen, onClose }) {
           {/* APPOINTMENT FORM */}
           {step === "appointment" && patient && (
             <form onSubmit={handleBooking} className="space-y-5">
-              <div className="flex items-center gap-3 rounded-2xl border border-[#dcfce7] bg-[#f0fdf4] p-4">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#dcfce7] text-[#166534]">
+              <div className="flex items-center gap-3 rounded-2xl border border-green-100 bg-green-50 p-4">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-700">
                   <CheckCircle2 size={23} />
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-[#166534]">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-green-700">
                     Patient Verified
                   </p>
-                  <h3 className="mt-1 truncate font-bold text-[#123b50]">
+                  <h3 className="mt-1 truncate font-bold text-gray-900">
                     {patient.name}
                   </h3>
-                  <p className="mt-1 text-xs text-[#668293]">
+                  <p className="mt-1 text-xs text-gray-500">
                     +91 {patient.phone}
                   </p>
                 </div>
@@ -611,7 +631,7 @@ export default function BookAppointmentModal({ isOpen, onClose }) {
                       className={`flex cursor-pointer items-center gap-3 rounded-xl border p-3 transition ${
                         appointment.doctor === doctor.id
                           ? "border-[#16587b] bg-[#edf6fa]"
-                          : "border-[#dceaf1] hover:border-blue-300"
+                          : "border-gray-200 hover:border-[#a7cadc]"
                       }`}
                     >
                       <input
@@ -622,14 +642,14 @@ export default function BookAppointmentModal({ isOpen, onClose }) {
                         onChange={updateAppointment}
                         className="h-4 w-4 accent-[#16587b]"
                       />
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#dceaf1] text-[#16587b]">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#e2f0f7] text-[#16587b]">
                         <UserRound size={20} />
                       </div>
                       <div className="flex-1">
-                        <p className="text-sm font-semibold text-[#123b50]">
+                        <p className="text-sm font-semibold text-gray-900">
                           {doctor.name}
                         </p>
-                        <p className="mt-0.5 text-xs text-[#668293]">
+                        <p className="mt-0.5 text-xs text-gray-500">
                           {doctor.specialty}
                         </p>
                       </div>
@@ -698,7 +718,7 @@ export default function BookAppointmentModal({ isOpen, onClose }) {
                   className={`${inputClass} resize-none`}
                   required
                 />
-                <p className="mt-1 text-right text-xs text-[#8aa3b1]">
+                <p className="mt-1 text-right text-xs text-gray-400">
                   {appointment.reason.length}/500
                 </p>
               </div>
@@ -710,7 +730,7 @@ export default function BookAppointmentModal({ isOpen, onClose }) {
                     className={`flex cursor-pointer items-center gap-3 rounded-xl border p-4 transition ${
                       appointment.payment === "cash"
                         ? "border-[#16587b] bg-[#edf6fa]"
-                        : "border-[#dceaf1]"
+                        : "border-gray-200"
                     }`}
                   >
                     <input
@@ -722,7 +742,7 @@ export default function BookAppointmentModal({ isOpen, onClose }) {
                       className="h-4 w-4 accent-[#16587b]"
                     />
                     <Banknote size={20} className="text-[#16587b]" />
-                    <span className="text-sm font-semibold text-[#123b50]">
+                    <span className="text-sm font-semibold text-gray-800">
                       Cash
                     </span>
                   </label>
@@ -731,7 +751,7 @@ export default function BookAppointmentModal({ isOpen, onClose }) {
                     className={`flex cursor-pointer items-center gap-3 rounded-xl border p-4 transition ${
                       appointment.payment === "online"
                         ? "border-[#16587b] bg-[#edf6fa]"
-                        : "border-[#dceaf1]"
+                        : "border-gray-200"
                     }`}
                   >
                     <input
@@ -743,13 +763,13 @@ export default function BookAppointmentModal({ isOpen, onClose }) {
                       className="h-4 w-4 accent-[#16587b]"
                     />
                     <CreditCard size={20} className="text-[#16587b]" />
-                    <span className="text-sm font-semibold text-[#123b50]">
+                    <span className="text-sm font-semibold text-gray-800">
                       Online
                     </span>
                   </label>
                 </div>
                 {appointment.payment === "online" && (
-                  <p className="mt-2 text-xs text-[#668293]">
+                  <p className="mt-2 text-xs text-gray-500">
                     Online payment is a UI demo only. No payment will be
                     processed.
                   </p>
@@ -757,7 +777,7 @@ export default function BookAppointmentModal({ isOpen, onClose }) {
               </div>
 
               {error && (
-                <p role="alert" className="rounded-xl bg-[#fff1f2] p-3 text-sm text-[#a9002d]">
+                <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm text-red-600">
                   {error}
                 </p>
               )}
@@ -774,20 +794,20 @@ export default function BookAppointmentModal({ isOpen, onClose }) {
           {/* SUCCESS */}
           {step === "success" && confirmation && (
             <div className="py-4 text-center">
-              <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-[#dcfce7] text-[#15803d]">
+              <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-green-100 text-green-600">
                 <CheckCircle2 size={44} />
               </div>
 
-              <h3 className="text-2xl font-bold text-[#123b50]">
+              <h3 className="text-2xl font-bold text-gray-900">
                 Appointment Booked!
               </h3>
-              <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-[#668293]">
+              <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-gray-500">
                 Your demo appointment has been created successfully.
               </p>
 
-              <div className="my-6 rounded-2xl border border-[#dceaf1] bg-[#f7fafc] p-5 text-left">
-                <div className="mb-4 flex items-center justify-between border-b border-[#dceaf1] pb-3">
-                  <span className="text-sm text-[#668293]">
+              <div className="my-6 rounded-2xl border border-gray-200 bg-gray-50 p-5 text-left">
+                <div className="mb-4 flex items-center justify-between border-b border-gray-200 pb-3">
+                  <span className="text-sm text-gray-500">
                     Demo Booking ID
                   </span>
                   <span className="text-sm font-bold text-[#16587b]">
@@ -806,15 +826,15 @@ export default function BookAppointmentModal({ isOpen, onClose }) {
                     key={label}
                     className="flex items-start justify-between gap-3 py-2"
                   >
-                    <span className="text-sm text-[#668293]">{label}</span>
-                    <span className="text-right text-sm font-semibold text-[#123b50]">
+                    <span className="text-sm text-gray-500">{label}</span>
+                    <span className="text-right text-sm font-semibold text-gray-900">
                       {value}
                     </span>
                   </div>
                 ))}
               </div>
 
-              <p className="mb-5 rounded-xl bg-[#fffbeb] p-3 text-xs leading-5 text-[#92400e]">
+              <p className="mb-5 rounded-xl bg-amber-50 p-3 text-xs leading-5 text-amber-800">
                 This is a frontend demonstration. The booking has not
                 been saved to a hospital database, and the slot has
                 not been confirmed by hospital staff.
@@ -823,12 +843,13 @@ export default function BookAppointmentModal({ isOpen, onClose }) {
               <button
                 type="button"
                 onClick={handleClose}
-                className="w-full rounded-xl bg-[#16587b] px-5 py-3.5 font-semibold text-white shadow-lg shadow-[#16587b]/15 transition hover:bg-[#104662]"
+                className="w-full rounded-xl bg-[#16587b] px-5 py-3.5 font-semibold text-white transition hover:bg-[#104662]"
               >
                 Done
               </button>
             </div>
           )}
+        </div>
         </div>
       </div>
     </div>

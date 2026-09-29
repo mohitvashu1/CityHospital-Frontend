@@ -128,10 +128,10 @@ function Navbar() {
           {/* CONTACT */}
 
           <Link
-            href="/contact"
+            href="/Admin"
             className="text-gray-700 transition-colors duration-200 hover:text-[#16587B]"
           >
-            Contact
+            Admin
           </Link>
 
           {/* =================================================
