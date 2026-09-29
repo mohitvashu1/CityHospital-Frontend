@@ -2,6 +2,33 @@
 
 
 
+/* Hospital ticker animation */
+.hospital-ticker-track {
+  width: max-content;
+  animation: hospital-ticker-scroll 32s linear infinite;
+  will-change: transform;
+}
+
+.hospital-ticker:hover .hospital-ticker-track {
+  animation-play-state: paused;
+}
+
+@keyframes hospital-ticker-scroll {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hospital-ticker-track {
+    animation: none;
+    transform: none;
+  }
+}
 :root {
   --background: #f7fafc;
   --primary: #16587b;
