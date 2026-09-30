@@ -12,7 +12,6 @@ import {
   FiChevronDown,
   FiHome,
   FiUsers,
-  FiBriefcase,
   FiActivity,
   FiStar,
   FiPhone,
@@ -145,17 +144,29 @@ export default function Navbar() {
         ? pathname === "/"
         : pathname.startsWith(href);
 
-    return `group relative inline-flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all duration-200 ${
+    return `group relative inline-flex items-center gap-2 rounded-xl px-3 lg:px-4 py-3 text-base lg:text-lg font-bold transition-all duration-200 ${
       isActive
         ? "bg-[#eaf3f8] text-[#16587b]"
-        : "text-[#385568] hover:bg-[#f0f7fa] hover:text-[#16587b]"
+        : "text-[#16587b] hover:bg-[#f0f7fa] hover:text-[#a9002d]"
+    }`;
+  };
+
+  const mobileLinkClass = (href) => {
+    const isActive =
+      href === "/"
+        ? pathname === "/"
+        : pathname.startsWith(href);
+
+    return `flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-bold transition ${
+      isActive
+        ? "bg-[#eaf3f8] text-[#16587b]"
+        : "text-[#16587b] hover:bg-[#f0f7fa] hover:text-[#a9002d]"
     }`;
   };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-[#dceaf1] bg-white/95 shadow-[0_4px_18px_rgba(18,59,80,0.06)] backdrop-blur-md">
-      <nav className="mx-auto flex h-[80px] max-w-[1400px] items-center justify-between gap-3 px-4 sm:px-6 lg:h-[86px] lg:px-10">
-
+      <nav className="mx-auto flex h-[80px] max-w-[1400px] items-center justify-between gap-3 px-4 sm:px-6 lg:h-[94px] lg:px-8 xl:px-10">
         {/* LOGO */}
         <Link
           href="/"
@@ -176,16 +187,15 @@ export default function Navbar() {
           <img
             src="/logo.png"
             alt="City Hospital Buxar"
-            className="h-12 w-auto object-contain sm:h-16"
+            className="h-12 w-auto object-contain sm:h-16 lg:h-[68px]"
           />
         </Link>
 
         {/* DESKTOP NAVIGATION */}
-        <div className="hidden items-center gap-1 lg:flex">
-
+        <div className="hidden items-center gap-1 xl:gap-2 lg:flex">
           {/* HOME */}
           <Link href="/" className={navLinkClass("/")}>
-            <FiHome size={16} />
+            <FiHome size={18} />
             <span>Home</span>
 
             {pathname === "/" && (
@@ -195,7 +205,7 @@ export default function Navbar() {
 
           {/* ALL DOCTORS */}
           <Link href="/doctors" className={navLinkClass("/doctors")}>
-            <FiUsers size={16} />
+            <FiUsers size={18} />
             <span>All Doctors</span>
 
             {pathname.startsWith("/doctors") && (
@@ -203,12 +213,15 @@ export default function Navbar() {
             )}
           </Link>
 
-          {/* ADMIN */}
-          <Link href="/Admin" className={navLinkClass("/Admin")}>
-            <FiBriefcase size={16} />
-            <span>Admin</span>
+          {/* SPECIALITIES */}
+          <Link
+            href="/specialities"
+            className={navLinkClass("/specialities")}
+          >
+            <FiActivity size={18} />
+            <span>Specialities</span>
 
-            {pathname.startsWith("/Admin") && (
+            {pathname.startsWith("/specialities") && (
               <span className="absolute bottom-0 left-3 right-3 h-[3px] rounded-full bg-[#a9002d]" />
             )}
           </Link>
@@ -220,15 +233,15 @@ export default function Navbar() {
               onClick={() => setIsExploreOpen((prev) => !prev)}
               aria-expanded={isExploreOpen}
               aria-haspopup="true"
-              className={`inline-flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-semibold transition-all duration-200 ${
+              className={`inline-flex items-center gap-2 rounded-xl px-3 lg:px-4 py-3 text-base lg:text-lg font-bold transition-all duration-200 ${
                 isExploreOpen
                   ? "bg-[#16587b] text-white shadow-md"
-                  : "text-[#385568] hover:bg-[#f0f7fa] hover:text-[#16587b]"
+                  : "text-[#16587b] hover:bg-[#f0f7fa] hover:text-[#a9002d]"
               }`}
             >
               Explore
               <FiChevronDown
-                size={16}
+                size={17}
                 className={`transition-transform duration-300 ${
                   isExploreOpen ? "rotate-180" : ""
                 }`}
@@ -247,7 +260,6 @@ export default function Navbar() {
 
                 {/* Dropdown panel */}
                 <div className="absolute right-0 top-[calc(100%+16px)] z-50 w-[320px] overflow-hidden rounded-2xl border border-[#dceaf1] bg-white shadow-[0_20px_60px_rgba(18,59,80,0.18)] sm:w-[340px]">
-
                   {/* Dropdown header */}
                   <div className="relative overflow-hidden bg-[#16587b] px-5 py-5">
                     <div className="absolute -right-7 -top-10 h-28 w-28 rounded-full border-[18px] border-white/5" />
@@ -323,24 +335,24 @@ export default function Navbar() {
           <button
             type="button"
             onClick={handleGetDirection}
-            className="group inline-flex h-11 items-center gap-2 rounded-full border border-[#16587b] px-5 text-sm font-semibold text-[#16587b] transition-all duration-200 hover:bg-[#16587b] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#16587b] focus-visible:ring-offset-2"
+            className="group inline-flex h-12 items-center gap-2 rounded-full border border-[#16587b] px-5 text-sm font-bold text-[#16587b] transition-all duration-200 hover:bg-[#16587b] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#16587b] focus-visible:ring-offset-2"
           >
             <FiMapPin
-              size={17}
+              size={18}
               className="transition-transform duration-200 group-hover:-translate-y-0.5"
             />
             <span>Get Direction</span>
             <FiArrowUpRight
-              size={16}
+              size={17}
               className="transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
             />
           </button>
 
           <Link
             href="/appointment"
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-full bg-[#16587b] px-6 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#104662] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#16587b] focus-visible:ring-offset-2"
+            className="inline-flex h-12 items-center justify-center gap-2 rounded-full bg-[#16587b] px-6 text-sm font-bold text-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#104662] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#16587b] focus-visible:ring-offset-2"
           >
-            <FiCalendar size={16} />
+            <FiCalendar size={17} />
             Book Appointment
           </Link>
         </div>
@@ -358,7 +370,7 @@ export default function Navbar() {
 
           <Link
             href="/appointment"
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-[#16587b] px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-[#104662]"
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-[#16587b] px-4 py-2.5 text-xs font-bold text-white transition hover:bg-[#104662]"
           >
             <FiCalendar size={15} />
             Book Appointment
@@ -381,16 +393,11 @@ export default function Navbar() {
       {isMenuOpen && (
         <div className="border-t border-[#dceaf1] bg-white shadow-lg lg:hidden">
           <div className="mx-auto flex max-w-[1400px] flex-col px-4 py-4 sm:px-6">
-
             {/* Mobile Home */}
             <Link
               href="/"
               onClick={closeMenu}
-              className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold transition ${
-                pathname === "/"
-                  ? "bg-[#eaf3f8] text-[#16587b]"
-                  : "text-[#385568] hover:bg-[#f0f7fa] hover:text-[#16587b]"
-              }`}
+              className={mobileLinkClass("/")}
             >
               <FiHome size={18} />
               Home
@@ -400,28 +407,20 @@ export default function Navbar() {
             <Link
               href="/doctors"
               onClick={closeMenu}
-              className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold transition ${
-                pathname.startsWith("/doctors")
-                  ? "bg-[#eaf3f8] text-[#16587b]"
-                  : "text-[#385568] hover:bg-[#f0f7fa] hover:text-[#16587b]"
-              }`}
+              className={mobileLinkClass("/doctors")}
             >
               <FiUsers size={18} />
               All Doctors
             </Link>
 
-            {/* Mobile Admin */}
+            {/* Mobile Specialities */}
             <Link
-              href="/Admin"
+              href="/specialities"
               onClick={closeMenu}
-              className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold transition ${
-                pathname.startsWith("/Admin")
-                  ? "bg-[#eaf3f8] text-[#16587b]"
-                  : "text-[#385568] hover:bg-[#f0f7fa] hover:text-[#16587b]"
-              }`}
+              className={mobileLinkClass("/specialities")}
             >
-              <FiBriefcase size={18} />
-              Admin
+              <FiActivity size={18} />
+              Specialities
             </Link>
 
             {/* Mobile Explore */}
@@ -432,10 +431,10 @@ export default function Navbar() {
                   setIsMobileExploreOpen((prev) => !prev)
                 }
                 aria-expanded={isMobileExploreOpen}
-                className={`flex w-full items-center justify-between rounded-xl px-3 py-3 text-sm font-semibold transition ${
+                className={`flex w-full items-center justify-between rounded-xl px-3 py-3 text-sm font-bold transition ${
                   isMobileExploreOpen
                     ? "bg-[#eaf3f8] text-[#16587b]"
-                    : "text-[#385568] hover:bg-[#f0f7fa] hover:text-[#16587b]"
+                    : "text-[#16587b] hover:bg-[#f0f7fa] hover:text-[#a9002d]"
                 }`}
               >
                 <span className="flex items-center gap-3">
@@ -461,7 +460,7 @@ export default function Navbar() {
                         key={item.id}
                         type="button"
                         onClick={() => scrollToSection(item.id)}
-                        className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm text-slate-600 transition hover:bg-[#f0f7fa] hover:text-[#16587b]"
+                        className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm font-medium text-slate-600 transition hover:bg-[#f0f7fa] hover:text-[#16587b]"
                       >
                         <span
                           className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${item.color}`}
@@ -484,7 +483,7 @@ export default function Navbar() {
                   closeMenu();
                   handleGetDirection();
                 }}
-                className="flex min-h-11 items-center justify-center gap-2 rounded-full border border-[#16587b] px-4 py-3 text-sm font-semibold text-[#16587b] transition hover:bg-[#16587b] hover:text-white"
+                className="flex min-h-11 items-center justify-center gap-2 rounded-full border border-[#16587b] px-4 py-3 text-sm font-bold text-[#16587b] transition hover:bg-[#16587b] hover:text-white"
               >
                 <FiMapPin size={17} />
                 Get Direction
@@ -494,7 +493,7 @@ export default function Navbar() {
               <Link
                 href="/appointment"
                 onClick={closeMenu}
-                className="flex min-h-11 items-center justify-center gap-2 rounded-full bg-[#16587b] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#104662]"
+                className="flex min-h-11 items-center justify-center gap-2 rounded-full bg-[#16587b] px-4 py-3 text-sm font-bold text-white transition hover:bg-[#104662]"
               >
                 <FiCalendar size={17} />
                 Book Appointment

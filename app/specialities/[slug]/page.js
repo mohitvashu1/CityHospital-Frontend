@@ -2,6 +2,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { FiPhone } from "react-icons/fi";
 import {
   specialities,
   getSpecialityBySlug,
@@ -49,7 +50,7 @@ export default async function SpecialityPage({ params }) {
         <div className="relative mx-auto grid max-w-7xl items-center gap-10 px-4 py-14 sm:px-6 md:grid-cols-2 md:py-20 lg:px-8">
           <div>
             <Link
-              href="/#specialities"
+              href="/specialities"
               className="mb-7 inline-flex items-center gap-2 text-sm font-medium text-white/80 transition hover:text-white"
             >
               <span aria-hidden="true">&#8592;</span>
@@ -78,8 +79,9 @@ export default async function SpecialityPage({ params }) {
 
               <a
                 href="tel:06183359844"
-                className="inline-flex items-center justify-center rounded-lg border border-white/40 px-6 py-3 font-semibold text-white transition hover:bg-white/10"
+                className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/40 px-6 py-3 font-semibold text-white transition hover:bg-white/10"
               >
+                <FiPhone size={18} />
                 Call Hospital
               </a>
             </div>
@@ -144,6 +146,7 @@ export default async function SpecialityPage({ params }) {
             <h3 className="text-lg font-bold text-[#123b50]">
               Need a consultation?
             </h3>
+
             <p className="mt-3 text-sm leading-6 text-[#617b89]">
               Contact City Hospital to ask about appointments and the care
               available for your needs.
@@ -158,8 +161,9 @@ export default async function SpecialityPage({ params }) {
 
             <a
               href="tel:06183359844"
-              className="mt-3 inline-flex w-full items-center justify-center rounded-lg border border-[#dceaf1] px-5 py-3 font-semibold text-[#16587b] transition hover:bg-[#f2f8fb]"
+              className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-[#dceaf1] px-5 py-3 font-semibold text-[#16587b] transition hover:bg-[#f2f8fb]"
             >
+              <FiPhone size={18} />
               06183 359 844
             </a>
           </div>
@@ -289,10 +293,12 @@ export default async function SpecialityPage({ params }) {
             >
               Book Appointment
             </Link>
+
             <a
               href="tel:06183359844"
-              className="inline-flex flex-1 items-center justify-center rounded-lg border border-white/30 px-6 py-3 font-semibold text-white transition hover:bg-white/10 md:flex-none"
+              className="inline-flex flex-1 items-center justify-center gap-2 rounded-lg border border-white/30 px-6 py-3 font-semibold text-white transition hover:bg-white/10 md:flex-none"
             >
+              <FiPhone size={18} />
               Call Now
             </a>
           </div>

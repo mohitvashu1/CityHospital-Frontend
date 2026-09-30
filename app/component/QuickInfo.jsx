@@ -18,7 +18,7 @@ const quickInfo = [
     description:
       "Comprehensive medical care for your healthcare needs.",
     linkText: "Explore Specialties",
-    link: "/services",
+    link: "/specialities",
     icon: Stethoscope,
     type: "light",
   },
