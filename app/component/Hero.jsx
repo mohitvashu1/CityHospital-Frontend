@@ -23,8 +23,7 @@ const heroImages = [
 const animatedTexts = [
   "Our Priority.",
   "Our Commitment.",
-  "Your Wellbeing.",
-  "Your Family's Health.",
+  
 ];
 
 export default function Hero() {
