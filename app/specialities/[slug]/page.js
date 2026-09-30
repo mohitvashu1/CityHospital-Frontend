@@ -100,36 +100,13 @@ export default async function SpecialityPage({ params }) {
         </div>
       </section>
 
-      {/* Quick information */}
-      <section className="relative z-10 mx-auto -mt-6 max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid overflow-hidden rounded-xl border border-[#dceaf1] bg-white shadow-lg sm:grid-cols-3">
-          <div className="p-5 text-center sm:border-r sm:border-[#dceaf1]">
-            <p className="text-sm text-[#78909c]">Hospital</p>
-            <p className="mt-1 font-bold text-[#123b50]">City Hospital</p>
-          </div>
-
-          <div className="p-5 text-center sm:border-r sm:border-[#dceaf1]">
-            <p className="text-sm text-[#78909c]">Location</p>
-            <p className="mt-1 font-bold text-[#123b50]">Buxar, Bihar</p>
-          </div>
-
-          <div className="p-5 text-center">
-            <p className="text-sm text-[#78909c]">Appointments</p>
-            <Link
-              href="/appointment"
-              className="mt-1 inline-block font-bold text-[#16587b] hover:text-[#a9002d]"
-            >
-              Book a Visit
-            </Link>
-          </div>
-        </div>
-      </section>
+    
 
       {/* About */}
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
-        <div className="grid gap-10 md:grid-cols-[1.2fr_0.8fr] md:items-start">
+        <div className="grid  md:grid-cols-[1.2fr_0.8fr] md:items-start">
           <div>
-            <span className="text-sm font-bold uppercase tracking-wider text-[#a9002d]">
+            <span className="text-xl font-bold uppercase tracking-wider text-[#a9002d]">
               About this speciality
             </span>
 
