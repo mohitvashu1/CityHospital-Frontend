@@ -18,6 +18,7 @@ import {
   FiCalendar,
   FiHeart,
   FiArrowRight,
+  FiShield,
 } from "react-icons/fi";
 
 const exploreItems = [
@@ -167,6 +168,7 @@ export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-[#dceaf1] bg-white/95 shadow-[0_4px_18px_rgba(18,59,80,0.06)] backdrop-blur-md">
       <nav className="mx-auto flex h-[80px] max-w-[1400px] items-center justify-between gap-3 px-4 sm:px-6 lg:h-[94px] lg:px-8 xl:px-10">
+
         {/* LOGO */}
         <Link
           href="/"
@@ -193,6 +195,7 @@ export default function Navbar() {
 
         {/* DESKTOP NAVIGATION */}
         <div className="hidden items-center gap-1 xl:gap-2 lg:flex">
+
           {/* HOME */}
           <Link href="/" className={navLinkClass("/")}>
             <FiHome size={18} />
@@ -260,6 +263,7 @@ export default function Navbar() {
 
                 {/* Dropdown panel */}
                 <div className="absolute right-0 top-[calc(100%+16px)] z-50 w-[320px] overflow-hidden rounded-2xl border border-[#dceaf1] bg-white shadow-[0_20px_60px_rgba(18,59,80,0.18)] sm:w-[340px]">
+
                   {/* Dropdown header */}
                   <div className="relative overflow-hidden bg-[#16587b] px-5 py-5">
                     <div className="absolute -right-7 -top-10 h-28 w-28 rounded-full border-[18px] border-white/5" />
@@ -316,6 +320,31 @@ export default function Navbar() {
                         </button>
                       );
                     })}
+
+                    {/* ADMIN LINK */}
+                    <Link
+                      href="/admin"
+                      onClick={() => setIsExploreOpen(false)}
+                      className="group flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left transition-all duration-200 hover:bg-[#f0f7fa]"
+                    >
+                      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-violet-700 transition-transform duration-200 group-hover:scale-105">
+                        <FiShield size={18} />
+                      </span>
+
+                      <span className="min-w-0 flex-1">
+                        <span className="block text-sm font-semibold text-[#123b50] transition-colors group-hover:text-[#16587b]">
+                          Admin
+                        </span>
+                        <span className="mt-0.5 block text-xs leading-5 text-slate-500">
+                          Hospital administration panel
+                        </span>
+                      </span>
+
+                      <FiArrowRight
+                        size={16}
+                        className="shrink-0 text-slate-300 transition-all duration-200 group-hover:translate-x-1 group-hover:text-[#16587b]"
+                      />
+                    </Link>
                   </div>
 
                   {/* Dropdown footer */}
@@ -393,6 +422,7 @@ export default function Navbar() {
       {isMenuOpen && (
         <div className="border-t border-[#dceaf1] bg-white shadow-lg lg:hidden">
           <div className="mx-auto flex max-w-[1400px] flex-col px-4 py-4 sm:px-6">
+
             {/* Mobile Home */}
             <Link
               href="/"
@@ -471,6 +501,18 @@ export default function Navbar() {
                       </button>
                     );
                   })}
+
+                  {/* MOBILE ADMIN LINK */}
+                  <Link
+                    href="/admin"
+                    onClick={closeMenu}
+                    className="flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm font-medium text-slate-600 transition hover:bg-[#f0f7fa] hover:text-[#16587b]"
+                  >
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-violet-50 text-violet-700">
+                      <FiShield size={16} />
+                    </span>
+                    <span>Admin</span>
+                  </Link>
                 </div>
               )}
             </div>
@@ -504,4 +546,4 @@ export default function Navbar() {
       )}
     </header>
   );
-}
+}   
