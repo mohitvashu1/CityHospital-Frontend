@@ -19,7 +19,8 @@ const doctors = [
     experience: "Experienced Physician",
     image: "/doctors/dr-pc-rai1.png",
     description:
-      "Providing comprehensive medical care with a focus on diagnosis, treatment and long-term health management.",
+    "Dr. P.C. Rai is a well-known General Medicine specialist with extensive experience in diagnosing and treating a wide range of medical conditions. He has expertise in General Medicine and is dedicated to providing comprehensive, patient-centered care. "
+
   },
   {
     id: 2,
