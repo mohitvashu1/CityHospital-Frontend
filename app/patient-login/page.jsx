@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -16,13 +17,13 @@ export default function PatientLoginPage() {
     e.preventDefault();
     setError("");
 
-    if (!/^[0-9]{10}$/.test(phone)) {
+    if (!/^[6-9]\d{9}$/.test(phone)) {
       setError("Enter a valid 10-digit mobile number.");
       return;
     }
 
-    if (!/^[0-9]{16}$/.test(aadhaar)) {
-      setError("Enter a valid 16-digit Aadhaar number.");
+    if (!/^\d{12}$/.test(aadhaar)) {
+      setError("Enter a valid 12-digit Aadhaar number.");
       return;
     }
 
@@ -32,24 +33,33 @@ export default function PatientLoginPage() {
       const data = await apiRequest("/api/auth/login", {
         method: "POST",
         body: {
-          phone,
-          aadhaar,
+          phone: phone.trim(),
+          aadhaar: aadhaar.trim(),
         },
       });
 
       if (!data.token) {
         throw new Error(
-          "Login succeeded, but the expected token was not returned. Check the backend response."
+          "Login response did not include an authentication token."
         );
       }
 
-      // Temporary development integration only.
-      // For production, use secure HttpOnly cookie authentication.
+      // Temporary development authentication.
+      // Never store the Aadhaar number in browser storage.
       sessionStorage.setItem("patientToken", data.token);
 
-      router.push("/patient-dashboard");
+      if (data.patient) {
+        sessionStorage.setItem(
+          "patient",
+          JSON.stringify(data.patient)
+        );
+      }
+
+      router.push("/patient/dashboard");
     } catch (err) {
-      setError(err.message || "Unable to login. Please try again.");
+      setError(
+        err.message || "Unable to login. Please try again."
+      );
     } finally {
       setLoading(false);
     }
@@ -85,9 +95,11 @@ export default function PatientLoginPage() {
               maxLength={10}
               value={phone}
               onChange={(e) =>
-                setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))
+                setPhone(
+                  e.target.value.replace(/\D/g, "").slice(0, 10)
+                )
               }
-              placeholder="Enter mobile number"
+              placeholder="Enter 10-digit mobile number"
               required
               className="w-full rounded-lg border border-[#dceaf1] px-4 py-3 outline-none focus:border-[#16587b] focus:ring-2 focus:ring-[#84b3ce]"
             />
@@ -106,19 +118,20 @@ export default function PatientLoginPage() {
               type="password"
               inputMode="numeric"
               autoComplete="off"
-              maxLength={16}
+              maxLength={12}
               value={aadhaar}
               onChange={(e) =>
                 setAadhaar(
-                  e.target.value.replace(/\D/g, "").slice(0, 16)
+                  e.target.value.replace(/\D/g, "").slice(0, 12)
                 )
               }
-              placeholder="Enter 16-digit Aadhaar number"
+              placeholder="Enter 12-digit Aadhaar number"
               required
               className="w-full rounded-lg border border-[#dceaf1] px-4 py-3 outline-none focus:border-[#16587b] focus:ring-2 focus:ring-[#84b3ce]"
             />
+
             <p className="mt-1 text-xs text-gray-500">
-              Use only the credentials registered with the hospital.
+              Use the credentials registered with the hospital.
             </p>
           </div>
 

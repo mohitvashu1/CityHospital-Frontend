@@ -155,7 +155,7 @@ export default function Hero() {
 
               <div className="border-l border-[#DCEAF1] pl-4">
                 <p className="text-xl font-bold text-[#16587B] sm:text-2xl">
-                  3+
+                  5+
                 </p>
 
                 <p className="mt-1 text-xs text-slate-500 sm:text-sm">

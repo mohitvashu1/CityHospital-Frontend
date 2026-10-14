@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   X,
   ArrowLeft,
@@ -16,13 +16,7 @@ import {
   Stethoscope,
   FileText,
 } from "lucide-react";
-import { demoPatients } from "../../data/demoPatients";
-
-const doctors = [
-  { id: "DOC001", name: "Doctor 1", specialty: "General Physician" },
-  { id: "DOC002", name: "Doctor 2", specialty: "General Physician" },
-  { id: "DOC003", name: "Doctor 3", specialty: "General Physician" },
-];
+import { apiRequest } from "../../../lib/api";
 
 const timeSlots = [
   "09:00 AM",
@@ -57,7 +51,9 @@ const initialAppointment = {
 
 export default function BookAppointmentModal({ isOpen, onClose }) {
   const [step, setStep] = useState("main");
-  const [patients, setPatients] = useState(demoPatients);
+  const [doctors, setDoctors] = useState([]);
+  const [token, setToken] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const [phone, setPhone] = useState("");
   const [aadhaar, setAadhaar] = useState("");
@@ -75,6 +71,31 @@ export default function BookAppointmentModal({ isOpen, onClose }) {
   const [error, setError] = useState("");
   const [confirmation, setConfirmation] = useState(null);
 
+  useEffect(() => {
+    if (!isOpen) return;
+
+    let cancelled = false;
+
+    const loadDoctors = async () => {
+      try {
+        const result = await apiRequest("/api/doctors");
+        if (!cancelled) {
+          setDoctors(Array.isArray(result.doctors) ? result.doctors : []);
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setError(err.message || "Unable to load doctors. Please try again.");
+        }
+      }
+    };
+
+    loadDoctors();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const resetModal = () => {
@@ -82,7 +103,9 @@ export default function BookAppointmentModal({ isOpen, onClose }) {
     setPhone("");
     setAadhaar("");
     setPatient(null);
+    setToken("");
     setError("");
+    setLoading(false);
     setRegister({
       name: "",
       phone: "",
@@ -117,8 +140,7 @@ export default function BookAppointmentModal({ isOpen, onClose }) {
     }));
   };
 
-  // DEMO ONLY: Replace with real backend authentication later.
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
 
@@ -132,21 +154,28 @@ export default function BookAppointmentModal({ isOpen, onClose }) {
       return;
     }
 
-    const found = patients.find(
-      (item) => item.phone === phone && item.aadhaar === aadhaar
-    );
+    setLoading(true);
+    try {
+      const result = await apiRequest("/api/auth/login", {
+        method: "POST",
+        body: { phone, aadhaar },
+      });
 
-    if (!found) {
-      setError("Patient not found. Please check your details or register.");
-      return;
+      if (!result.token || !result.patient) {
+        throw new Error("Login response was incomplete. Please try again.");
+      }
+
+      setToken(result.token);
+      setPatient(result.patient);
+      setStep("appointment");
+    } catch (err) {
+      setError(err.message || "Login failed. Please check your details.");
+    } finally {
+      setLoading(false);
     }
-
-    setPatient(found);
-    setStep("appointment");
   };
 
-  // DEMO ONLY: Registration is stored in temporary component state.
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
     setError("");
 
@@ -160,56 +189,89 @@ export default function BookAppointmentModal({ isOpen, onClose }) {
       return;
     }
 
-    const alreadyExists = patients.some(
-      (item) =>
-        item.phone === register.phone ||
-        item.aadhaar === register.aadhaar
-    );
+    setLoading(true);
+    try {
+      const body = {
+        name: register.name.trim(),
+        phone: register.phone,
+        aadhaar: register.aadhaar,
+        ...(register.dob ? { dateOfBirth: register.dob } : {}),
+        ...(register.gender && register.gender !== "Prefer not to say"
+          ? { gender: register.gender }
+          : {}),
+      };
 
-    if (alreadyExists) {
-      setError("This mobile or Aadhaar number is already registered.");
-      return;
+      const result = await apiRequest("/api/auth/register", {
+        method: "POST",
+        body,
+      });
+
+      if (!result.token || !result.patient) {
+        throw new Error("Registration response was incomplete. Please try again.");
+      }
+
+      setToken(result.token);
+      setPatient(result.patient);
+      setStep("appointment");
+    } catch (err) {
+      setError(err.message || "Registration failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
-
-    const newPatient = {
-      id: `PAT${String(patients.length + 1).padStart(3, "0")}`,
-      ...register,
-    };
-
-    setPatients((prev) => [...prev, newPatient]);
-    setPatient(newPatient);
-    setStep("appointment");
   };
 
-  const handleBooking = (e) => {
+  const handleBooking = async (e) => {
     e.preventDefault();
     setError("");
 
-    if (!patient || !appointment.doctor ||
+    if (!patient || !token || !appointment.doctor ||
         !appointment.date || !appointment.time ||
         !appointment.reason.trim()) {
-      setError("Please complete all appointment details.");
+      setError("Please complete all appointment details and sign in again if needed.");
       return;
     }
 
     if (appointment.date < getToday()) {
-      setError("Please select a valid future date.");
+      setError("Please select today or a future date.");
       return;
     }
 
-    // DEMO ONLY: No appointment is saved to a real database.
-    setConfirmation({
-      id: `DEMO-${Date.now().toString().slice(-6)}`,
-      patient: patient.name,
-      doctor: doctors.find(
-        (doctor) => doctor.id === appointment.doctor
-      )?.name,
-      date: appointment.date,
-      time: appointment.time,
-      payment: appointment.payment,
-    });
+    setLoading(true);
+    try {
+      const result = await apiRequest("/api/appointments", {
+        method: "POST",
+        token,
+        body: {
+          doctorId: appointment.doctor,
+          appointmentDate: appointment.date,
+          appointmentTime: appointment.time,
+          reason: appointment.reason.trim(),
+        },
+      });
 
-    setStep("success");
+      const saved = result.appointment;
+      const selectedDoctor = doctors.find(
+        (doctor) => (doctor.id || doctor._id) === appointment.doctor
+      );
+
+      setConfirmation({
+        id: saved?.appointmentId || saved?._id || "Confirmed",
+        patient: patient.name,
+        doctor:
+          saved?.doctorId?.name ||
+          selectedDoctor?.name ||
+          "Selected doctor",
+        date: appointment.date,
+        time: appointment.time,
+        payment: appointment.payment,
+      });
+
+      setStep("success");
+    } catch (err) {
+      setError(err.message || "Unable to book appointment. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const changeStep = (nextStep) => {
@@ -292,7 +354,7 @@ export default function BookAppointmentModal({ isOpen, onClose }) {
                 {step === "login" && "Verify your registered account."}
                 {step === "register" && "Create your patient profile."}
                 {step === "appointment" && "Schedule your hospital visit."}
-                {step === "success" && "Your demo booking is complete."}
+                {step === "success" && "Your appointment request has been saved."}
               </p>
             </div>
           </div>
@@ -366,10 +428,7 @@ export default function BookAppointmentModal({ isOpen, onClose }) {
                 </span>
               </button>
 
-              <p className="pt-2 text-center text-xs text-gray-400">
-                Demo frontend only. Real authentication will be
-                connected later.
-              </p>
+
             </div>
           )}
 
@@ -435,33 +494,11 @@ export default function BookAppointmentModal({ isOpen, onClose }) {
 
               <button
                 type="submit"
-                className="w-full rounded-xl bg-[#16587b] px-5 py-3.5 font-semibold text-white transition hover:bg-[#104662] active:scale-[0.99]"
+                disabled={loading}
+                className="w-full rounded-xl bg-[#16587b] px-5 py-3.5 font-semibold text-white transition hover:bg-[#104662] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Verify & Continue
+                {loading ? "Verifying..." : "Verify & Continue"}
               </button>
-
-              <div className="rounded-xl border border-dashed border-gray-200 bg-gray-50 p-4">
-                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">
-                  Demo login credentials
-                </p>
-                <p className="text-sm text-gray-700">
-                  Mobile: <strong>9876543210</strong>
-                </p>
-                <p className="mt-1 text-sm text-gray-700">
-                  Aadhaar: <strong>123456789012</strong>
-                </p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setPhone("9876543210");
-                    setAadhaar("123456789012");
-                    setError("");
-                  }}
-                  className="mt-3 text-sm font-semibold text-[#16587b] hover:underline"
-                >
-                  Fill demo details
-                </button>
-              </div>
 
               <p className="text-center text-sm text-gray-500">
                 New patient?{" "}
@@ -579,9 +616,10 @@ export default function BookAppointmentModal({ isOpen, onClose }) {
 
               <button
                 type="submit"
-                className="w-full rounded-xl bg-[#16587b] px-5 py-3.5 font-semibold text-white transition hover:bg-[#104662]"
+                disabled={loading}
+                className="w-full rounded-xl bg-[#16587b] px-5 py-3.5 font-semibold text-white transition hover:bg-[#104662] disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Register & Continue
+                {loading ? "Registering..." : "Register & Continue"}
               </button>
 
               <p className="text-center text-sm text-gray-500">
@@ -625,11 +663,13 @@ export default function BookAppointmentModal({ isOpen, onClose }) {
                   </span>
                 </label>
                 <div className="space-y-2">
-                  {doctors.map((doctor) => (
+                  {doctors.map((doctor) => {
+                    const doctorId = doctor.id || doctor._id;
+                    return (
                     <label
-                      key={doctor.id}
+                      key={doctorId}
                       className={`flex cursor-pointer items-center gap-3 rounded-xl border p-3 transition ${
-                        appointment.doctor === doctor.id
+                        appointment.doctor === doctorId
                           ? "border-[#16587b] bg-[#edf6fa]"
                           : "border-gray-200 hover:border-[#a7cadc]"
                       }`}
@@ -637,8 +677,8 @@ export default function BookAppointmentModal({ isOpen, onClose }) {
                       <input
                         type="radio"
                         name="doctor"
-                        value={doctor.id}
-                        checked={appointment.doctor === doctor.id}
+                        value={doctorId}
+                        checked={appointment.doctor === doctorId}
                         onChange={updateAppointment}
                         className="h-4 w-4 accent-[#16587b]"
                       />
@@ -650,11 +690,15 @@ export default function BookAppointmentModal({ isOpen, onClose }) {
                           {doctor.name}
                         </p>
                         <p className="mt-0.5 text-xs text-gray-500">
-                          {doctor.specialty}
+                          {doctor.specialization || doctor.specialty || doctor.department || "Consultation"}
                         </p>
+                        {doctor.qualification && (
+                          <p className="mt-1 text-xs text-gray-400">{doctor.qualification}</p>
+                        )}
                       </div>
                     </label>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 
@@ -782,11 +826,18 @@ export default function BookAppointmentModal({ isOpen, onClose }) {
                 </p>
               )}
 
+              {doctors.length === 0 && (
+                <p role="status" className="rounded-xl bg-amber-50 p-3 text-sm text-amber-800">
+                  No active doctors are available right now. Please try again later.
+                </p>
+              )}
+
               <button
                 type="submit"
-                className="w-full rounded-xl bg-[#16587b] px-5 py-3.5 font-semibold text-white shadow-lg shadow-[#16587b]/20 transition hover:bg-[#104662] active:scale-[0.99]"
+                disabled={loading || doctors.length === 0}
+                className="w-full rounded-xl bg-[#16587b] px-5 py-3.5 font-semibold text-white shadow-lg shadow-[#16587b]/20 transition hover:bg-[#104662] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Confirm Appointment
+                {loading ? "Booking..." : "Confirm Appointment"}
               </button>
             </form>
           )}
@@ -802,13 +853,13 @@ export default function BookAppointmentModal({ isOpen, onClose }) {
                 Appointment Booked!
               </h3>
               <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-gray-500">
-                Your demo appointment has been created successfully.
+                Your appointment has been saved successfully.
               </p>
 
               <div className="my-6 rounded-2xl border border-gray-200 bg-gray-50 p-5 text-left">
                 <div className="mb-4 flex items-center justify-between border-b border-gray-200 pb-3">
                   <span className="text-sm text-gray-500">
-                    Demo Booking ID
+                    Appointment ID
                   </span>
                   <span className="text-sm font-bold text-[#16587b]">
                     {confirmation.id}
@@ -835,9 +886,7 @@ export default function BookAppointmentModal({ isOpen, onClose }) {
               </div>
 
               <p className="mb-5 rounded-xl bg-amber-50 p-3 text-xs leading-5 text-amber-800">
-                This is a frontend demonstration. The booking has not
-                been saved to a hospital database, and the slot has
-                not been confirmed by hospital staff.
+                Your appointment has been recorded by the system. Please contact the hospital if you need to confirm availability or payment details.
               </p>
 
               <button
