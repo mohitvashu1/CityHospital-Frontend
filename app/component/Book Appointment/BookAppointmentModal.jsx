@@ -1,246 +1,189 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
 import {
-  X,
-  ArrowLeft,
-  UserRound,
-  UserPlus,
-  CalendarDays,
-  Clock3,
-  ShieldCheck,
-  CheckCircle2,
-  CreditCard,
-  Banknote,
-  Stethoscope,
-  FileText,
+  X, ArrowLeft, CalendarDays, Clock3, Stethoscope, UserRound,
+  UserPlus, CheckCircle2, AlertCircle, RefreshCw, ShieldCheck,
 } from "lucide-react";
 import { apiRequest } from "../../../lib/api";
 
-const timeSlots = [
-  "09:00 AM",
-  "09:30 AM",
-  "10:00 AM",
-  "10:30 AM",
-  "11:00 AM",
-  "11:30 AM",
-  "12:00 PM",
-  "04:00 PM",
-  "04:30 PM",
-  "05:00 PM",
-  "05:30 PM",
-  "06:00 PM",
+const TIME_SLOTS = [
+  "09:00 AM", "09:30 AM", "10:00 AM", "10:30 AM",
+  "11:00 AM", "11:30 AM", "12:00 PM",
+  "04:00 PM", "04:30 PM", "05:00 PM", "05:30 PM", "06:00 PM",
 ];
 
-function getToday() {
-  const date = new Date();
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
-
-const initialAppointment = {
+const EMPTY_APPOINTMENT = {
   doctor: "",
   date: "",
   time: "",
   reason: "",
-  payment: "cash",
 };
 
+function todayString() {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+}
+
+function getStoredPatient() {
+  try {
+    return JSON.parse(sessionStorage.getItem("patient") || "null");
+  } catch {
+    return null;
+  }
+}
+
 export default function BookAppointmentModal({ isOpen, onClose }) {
-  const [step, setStep] = useState("main");
+  const [step, setStep] = useState("appointment");
   const [doctors, setDoctors] = useState([]);
+  const [patient, setPatient] = useState(null);
   const [token, setToken] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const [phone, setPhone] = useState("");
-  const [aadhaar, setAadhaar] = useState("");
-  const [patient, setPatient] = useState(null);
-
-  const [register, setRegister] = useState({
-    name: "",
-    phone: "",
-    aadhaar: "",
-    gender: "",
-    dob: "",
-  });
-
-  const [appointment, setAppointment] = useState(initialAppointment);
+  const [loadingDoctors, setLoadingDoctors] = useState(false);
   const [error, setError] = useState("");
   const [confirmation, setConfirmation] = useState(null);
+  const [phone, setPhone] = useState("");
+  const [aadhaar, setAadhaar] = useState("");
+  const [register, setRegister] = useState({
+    name: "", phone: "", aadhaar: "", gender: "", dob: "",
+  });
+  const [appointment, setAppointment] = useState(EMPTY_APPOINTMENT);
 
   useEffect(() => {
     if (!isOpen) return;
+    const savedToken = sessionStorage.getItem("patientToken") || "";
+    const savedPatient = getStoredPatient();
+    setToken(savedToken);
+    setPatient(savedPatient);
+    setStep(savedToken ? "appointment" : "access");
+    setError("");
 
     let cancelled = false;
-
-    const loadDoctors = async () => {
+    async function loadDoctors() {
+      setLoadingDoctors(true);
       try {
         const result = await apiRequest("/api/doctors");
         if (!cancelled) {
           setDoctors(Array.isArray(result.doctors) ? result.doctors : []);
+          if (!Array.isArray(result.doctors) || result.doctors.length === 0) {
+            setError("No active doctors are available right now.");
+          }
         }
       } catch (err) {
-        if (!cancelled) {
-          setError(err.message || "Unable to load doctors. Please try again.");
-        }
+        if (!cancelled) setError(err.message || "Unable to load doctors.");
+      } finally {
+        if (!cancelled) setLoadingDoctors(false);
       }
-    };
-
+    }
     loadDoctors();
-
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [isOpen]);
 
   if (!isOpen) return null;
 
-  const resetModal = () => {
-    setStep("main");
-    setPhone("");
-    setAadhaar("");
-    setPatient(null);
-    setToken("");
+  const close = () => {
     setError("");
-    setLoading(false);
-    setRegister({
-      name: "",
-      phone: "",
-      aadhaar: "",
-      gender: "",
-      dob: "",
-    });
-    setAppointment(initialAppointment);
-    setConfirmation(null);
+    onClose?.();
   };
 
-  const handleClose = () => {
-    resetModal();
-    onClose();
-  };
-
-  const updateRegister = (e) => {
-    const { name, value } = e.target;
-
-    setRegister((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const updateAppointment = (e) => {
-    const { name, value } = e.target;
-
-    setAppointment((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleLogin = async (e) => {
-    e.preventDefault();
+  const updateAppointment = (event) => {
+    setAppointment((current) => ({ ...current, [event.target.name]: event.target.value }));
     setError("");
+  };
 
-    if (!/^\d{10}$/.test(phone)) {
+  const saveSession = (data) => {
+    if (!data?.token || !data?.patient) {
+      throw new Error("The server returned an incomplete patient session.");
+    }
+    sessionStorage.setItem("patientToken", data.token);
+    sessionStorage.setItem("patient", JSON.stringify(data.patient));
+    setToken(data.token);
+    setPatient(data.patient);
+    setStep("appointment");
+    setError("");
+  };
+
+  async function handleLogin(event) {
+    event.preventDefault();
+    setError("");
+    if (!/^[6-9]\d{9}$/.test(phone)) {
       setError("Enter a valid 10-digit mobile number.");
       return;
     }
-
     if (!/^\d{12}$/.test(aadhaar)) {
       setError("Enter a valid 12-digit Aadhaar number.");
       return;
     }
-
     setLoading(true);
     try {
-      const result = await apiRequest("/api/auth/login", {
+      const data = await apiRequest("/api/auth/login", {
         method: "POST",
-        body: { phone, aadhaar },
+        body: { phone: phone.trim(), aadhaar: aadhaar.trim() },
       });
-
-      if (!result.token || !result.patient) {
-        throw new Error("Login response was incomplete. Please try again.");
-      }
-
-      setToken(result.token);
-      setPatient(result.patient);
-      setStep("appointment");
+      saveSession(data);
     } catch (err) {
-      setError(err.message || "Login failed. Please check your details.");
+      setError(err.message || "Unable to verify patient details.");
     } finally {
       setLoading(false);
     }
-  };
+  }
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
+  async function handleRegister(event) {
+    event.preventDefault();
     setError("");
-
-    if (!/^\d{10}$/.test(register.phone)) {
+    if (!register.name.trim()) {
+      setError("Enter the patient's full name.");
+      return;
+    }
+    if (!/^[6-9]\d{9}$/.test(register.phone)) {
       setError("Enter a valid 10-digit mobile number.");
       return;
     }
-
     if (!/^\d{12}$/.test(register.aadhaar)) {
       setError("Enter a valid 12-digit Aadhaar number.");
       return;
     }
-
     setLoading(true);
     try {
       const body = {
         name: register.name.trim(),
-        phone: register.phone,
-        aadhaar: register.aadhaar,
+        phone: register.phone.trim(),
+        aadhaar: register.aadhaar.trim(),
         ...(register.dob ? { dateOfBirth: register.dob } : {}),
-        ...(register.gender && register.gender !== "Prefer not to say"
-          ? { gender: register.gender }
-          : {}),
+        ...(register.gender ? { gender: register.gender } : {}),
       };
-
-      const result = await apiRequest("/api/auth/register", {
-        method: "POST",
-        body,
-      });
-
-      if (!result.token || !result.patient) {
-        throw new Error("Registration response was incomplete. Please try again.");
-      }
-
-      setToken(result.token);
-      setPatient(result.patient);
-      setStep("appointment");
+      const data = await apiRequest("/api/auth/register", { method: "POST", body });
+      saveSession(data);
     } catch (err) {
-      setError(err.message || "Registration failed. Please try again.");
+      setError(err.message || "Unable to register patient.");
     } finally {
       setLoading(false);
     }
-  };
+  }
 
-  const handleBooking = async (e) => {
-    e.preventDefault();
+  async function handleBooking(event) {
+    event.preventDefault();
     setError("");
-
-    if (!patient || !token || !appointment.doctor ||
-        !appointment.date || !appointment.time ||
-        !appointment.reason.trim()) {
-      setError("Please complete all appointment details and sign in again if needed.");
+    const currentToken = sessionStorage.getItem("patientToken") || token;
+    if (!currentToken) {
+      setStep("access");
+      setError("Please login or register before booking.");
       return;
     }
-
-    if (appointment.date < getToday()) {
+    if (!appointment.doctor || !appointment.date || !appointment.time || !appointment.reason.trim()) {
+      setError("Please complete all appointment details.");
+      return;
+    }
+    if (appointment.date < todayString()) {
       setError("Please select today or a future date.");
       return;
     }
 
     setLoading(true);
     try {
-      const result = await apiRequest("/api/appointments", {
+      const data = await apiRequest("/api/appointments", {
         method: "POST",
-        token,
+        token: currentToken,
         body: {
           doctorId: appointment.doctor,
           appointmentDate: appointment.date,
@@ -248,659 +191,171 @@ export default function BookAppointmentModal({ isOpen, onClose }) {
           reason: appointment.reason.trim(),
         },
       });
-
-      const saved = result.appointment;
-      const selectedDoctor = doctors.find(
-        (doctor) => (doctor.id || doctor._id) === appointment.doctor
-      );
-
+      const saved = data.appointment;
+      const doctor = doctors.find((item) => String(item._id || item.id) === appointment.doctor);
       setConfirmation({
-        id: saved?.appointmentId || saved?._id || "Confirmed",
-        patient: patient.name,
-        doctor:
-          saved?.doctorId?.name ||
-          selectedDoctor?.name ||
-          "Selected doctor",
+        id: saved?.appointmentId || saved?._id || "Booked",
+        patient: saved?.patientId?.name || patient?.name || "Patient",
+        doctor: saved?.doctorId?.name || doctor?.name || "Selected doctor",
+        specialty: saved?.doctorId?.specialization || doctor?.specialization || doctor?.department || "",
         date: appointment.date,
         time: appointment.time,
-        payment: appointment.payment,
       });
-
       setStep("success");
     } catch (err) {
-      setError(err.message || "Unable to book appointment. Please try again.");
+      setError(err.message || "Unable to book appointment.");
     } finally {
       setLoading(false);
     }
-  };
+  }
 
-  const changeStep = (nextStep) => {
-    setError("");
-    setStep(nextStep);
-  };
-
-  const inputClass =
-    "w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-800 outline-none transition placeholder:text-gray-400 focus:border-[#16587b] focus:ring-2 focus:ring-[#e4f1f7]";
-
-  const labelClass =
-    "mb-2 block text-sm font-semibold text-gray-700";
+  const inputClass = "w-full rounded-xl border border-[#dceaf1] bg-white px-3.5 py-2.5 text-sm text-[#123b50] outline-none transition placeholder:text-gray-400 hover:border-[#84b3ce] focus:border-[#16587b] focus:ring-4 focus:ring-[#16587b]/10";
+  const labelClass = "mb-1.5 block text-xs font-medium text-[#123b50]";
 
   return (
-    <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center overflow-y-auto bg-[#092c40]/75 p-3 backdrop-blur-md sm:p-5"
-      onMouseDown={(e) => {
-        if (e.target === e.currentTarget) handleClose();
-      }}
-    >
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="appointment-title"
-        className="relative my-auto flex max-h-[94vh] w-full max-w-5xl overflow-hidden rounded-[28px] border border-white/70 bg-white shadow-[0_30px_100px_-25px_rgba(8,47,73,0.45)]"
-      >
-        <aside className="relative hidden w-[34%] shrink-0 flex-col justify-between overflow-hidden bg-[#16587b] p-8 text-white md:flex lg:p-10">
-          <div className="absolute -right-24 -top-20 h-72 w-72 rounded-full border-[38px] border-white/[0.06]" />
-          <div className="absolute -bottom-24 -left-20 h-72 w-72 rounded-full border-[38px] border-white/[0.06]" />
-          <div className="relative z-10">
-            <div className="mb-9 flex h-16 w-16 items-center justify-center rounded-2xl bg-white p-2 shadow-lg shadow-slate-950/10">
-              <img src="/logo1.png" alt="City Hospital logo" className="h-full w-full object-contain" />
-            </div>
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#b9d8e8]">City Hospital · Buxar</p>
-            <h2 className="mt-4 text-3xl font-bold leading-tight lg:text-[2.5rem]">Care that feels closer.</h2>
-            <p className="mt-4 max-w-xs text-sm leading-7 text-blue-50/85">Book your consultation in a few simple steps. Our team is here to help you plan your visit.</p>
-            <div className="mt-9 h-1 w-14 rounded-full bg-[#a9002d]" />
-            <div className="mt-8 space-y-5 text-sm text-blue-50/90">
-              <div className="flex items-start gap-3"><span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/10 text-xs font-bold">01</span><span><strong className="block font-semibold text-white">Patient details</strong><span className="mt-1 block text-blue-100/75">Login or create your profile</span></span></div>
-              <div className="flex items-start gap-3"><span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/10 text-xs font-bold">02</span><span><strong className="block font-semibold text-white">Choose consultation</strong><span className="mt-1 block text-blue-100/75">Select doctor, date and time</span></span></div>
-              <div className="flex items-start gap-3"><span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white/10 text-xs font-bold">03</span><span><strong className="block font-semibold text-white">Review booking</strong><span className="mt-1 block text-blue-100/75">Confirm your appointment details</span></span></div>
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center overflow-y-auto bg-[#123b50]/55 p-3 backdrop-blur-sm sm:p-5"
+      onMouseDown={(event) => { if (event.target === event.currentTarget) close(); }}>
+      <section role="dialog" aria-modal="true" aria-labelledby="appointment-title"
+        className="my-auto flex max-h-[94vh] w-full max-w-4xl overflow-hidden rounded-2xl border border-[#dceaf1] bg-white shadow-2xl">
+        <aside className="relative hidden w-[31%] shrink-0 flex-col justify-between overflow-hidden bg-[#16587b] p-6 text-white md:flex">
+          <div className="pointer-events-none absolute -right-16 -top-12 h-44 w-44 rounded-full border-[22px] border-white/[0.07]" />
+          <div className="relative">
+            <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-xl bg-white/10"><Stethoscope size={23}/></div>
+            <p className="text-[11px] uppercase tracking-[0.18em] text-[#c7e1ee]">City Hospital · Buxar</p>
+            <h2 className="mt-3 text-xl font-semibold leading-7">Book your visit</h2>
+            <p className="mt-2 text-sm leading-6 text-blue-50/80">Choose your doctor and a convenient appointment time.</p>
+            <div className="mt-6 h-1 w-10 rounded-full bg-[#a9002d]"/>
+            <div className="mt-6 space-y-4 text-xs text-blue-50/90">
+              <p className="flex items-center gap-2"><CheckCircle2 size={15}/> Secure patient session</p>
+              <p className="flex items-center gap-2"><CheckCircle2 size={15}/> Active doctor list</p>
+              <p className="flex items-center gap-2"><CheckCircle2 size={15}/> Confirmation from server</p>
             </div>
           </div>
-          <div className="relative z-10 mt-10 border-t border-white/15 pt-5 text-xs leading-5 text-blue-100/70">Your health, our priority.<br />Near Hindustan Machinery, Golumber, Buxar</div>
+          <p className="relative text-[11px] leading-5 text-blue-100/70">Near Hindustan Machinery,<br/>Golumber, Buxar, Bihar</p>
         </aside>
+
         <div className="min-w-0 flex-1 overflow-y-auto bg-[#fbfdfe]">
-        {/* HEADER */}
-        <div className="sticky top-0 z-20 flex items-center justify-between border-b border-[#dceaf1] bg-white/95 px-5 py-4 backdrop-blur-md sm:px-8 sm:py-5">
-          <div className="flex items-center gap-3">
-            {step !== "main" && step !== "success" && (
-              <button
-                type="button"
-                onClick={() => {
-                  if (step === "appointment" && patient) {
-                    changeStep("main");
-                  } else {
-                    changeStep("main");
-                  }
-                }}
-                className="flex h-9 w-9 items-center justify-center rounded-full bg-gray-100 text-gray-600 transition hover:bg-[#edf6fa] hover:text-[#16587b]"
-                aria-label="Go back"
-              >
-                <ArrowLeft size={18} />
-              </button>
+          <header className="sticky top-0 z-10 flex items-center justify-between border-b border-[#dceaf1] bg-white/95 px-4 py-3.5 backdrop-blur sm:px-6">
+            <div className="flex items-center gap-2.5">
+              {step !== "appointment" && step !== "success" && (
+                <button type="button" onClick={() => { setStep(token ? "appointment" : "access"); setError(""); }}
+                  className="rounded-lg p-2 text-gray-500 transition hover:bg-[#edf6fa] hover:text-[#16587b]" aria-label="Go back">
+                  <ArrowLeft size={17}/>
+                </button>
+              )}
+              <div>
+                <h2 id="appointment-title" className="text-base font-semibold text-[#123b50]">
+                  {step === "access" && "Patient access"}
+                  {step === "login" && "Patient login"}
+                  {step === "register" && "New patient registration"}
+                  {step === "appointment" && "Appointment details"}
+                  {step === "success" && "Appointment booked"}
+                </h2>
+                <p className="mt-0.5 text-xs text-gray-500">
+                  {step === "access" && "Login or create a patient account"}
+                  {step === "login" && "Use your registered mobile and Aadhaar"}
+                  {step === "register" && "Enter the patient's details"}
+                  {step === "appointment" && "Select doctor, date and time"}
+                  {step === "success" && "Your appointment is saved in the hospital system"}
+                </p>
+              </div>
+            </div>
+            <button type="button" onClick={close} className="rounded-lg p-2 text-gray-500 transition hover:bg-red-50 hover:text-[#a9002d]" aria-label="Close booking">
+              <X size={19}/>
+            </button>
+          </header>
+
+          <div className="p-4 sm:p-6">
+            {error && (
+              <div role="alert" className="mb-4 flex items-start gap-2 rounded-xl border border-red-100 bg-red-50 px-3.5 py-3 text-sm text-red-700">
+                <AlertCircle size={17} className="mt-0.5 shrink-0"/><span>{error}</span>
+              </div>
             )}
 
-            <div>
-              <h2
-                id="appointment-title"
-                className="text-xl font-bold text-gray-900 sm:text-2xl"
-              >
-                {step === "main" && "Book Appointment"}
-                {step === "login" && "Patient Login"}
-                {step === "register" && "Patient Registration"}
-                {step === "appointment" && "Appointment Details"}
-                {step === "success" && "Appointment Confirmed"}
-              </h2>
-              <p className="mt-1 text-xs text-gray-500 sm:text-sm">
-                {step === "main" && "Your health, our priority."}
-                {step === "login" && "Verify your registered account."}
-                {step === "register" && "Create your patient profile."}
-                {step === "appointment" && "Schedule your hospital visit."}
-                {step === "success" && "Your appointment request has been saved."}
-              </p>
-            </div>
-          </div>
-
-          <button
-            type="button"
-            onClick={handleClose}
-            aria-label="Close modal"
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-gray-500 transition hover:bg-red-50 hover:text-red-500"
-          >
-            <X size={21} />
-          </button>
-        </div>
-
-        <div className="p-5 sm:p-8 lg:p-9">
-          {/* MAIN CHOICE */}
-          {step === "main" && (
-            <div className="space-y-4">
-              <div className="mb-6 rounded-2xl border border-[#d4e7f0] bg-[#edf6fa] p-5">
-                <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-[#16587b] text-white">
-                  <CalendarDays size={24} />
+            {step === "access" && (
+              <div className="space-y-3">
+                <div className="rounded-xl border border-[#dceaf1] bg-[#edf6fa] p-4">
+                  <p className="text-sm font-medium text-[#123b50]">Continue to appointment booking</p>
+                  <p className="mt-1 text-xs leading-5 text-gray-600">If you already logged in, your session will be reused automatically.</p>
                 </div>
-                <h3 className="text-lg font-bold text-gray-900">
-                  Schedule your visit
-                </h3>
-                <p className="mt-1 text-sm leading-6 text-gray-600">
-                  Continue with your existing patient account or
-                  register as a new patient.
-                </p>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => changeStep("login")}
-                className="group flex w-full items-center gap-4 rounded-2xl border border-gray-200 p-4 text-left transition hover:border-[#16587b] hover:bg-[#edf6fa]/60"
-              >
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#e2f0f7] text-[#16587b]">
-                  <UserRound size={23} />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <h3 className="font-bold text-gray-900">
-                    Already Registered?
-                  </h3>
-                  <p className="mt-1 text-xs leading-5 text-gray-500 sm:text-sm">
-                    Login with your mobile and Aadhaar number.
-                  </p>
-                </div>
-                <span className="text-xl text-gray-400 transition group-hover:translate-x-1 group-hover:text-[#16587b]">
-                  →
-                </span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => changeStep("register")}
-                className="group flex w-full items-center gap-4 rounded-2xl border border-gray-200 p-4 text-left transition hover:border-[#16587b] hover:bg-[#edf6fa]/60"
-              >
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#e2f0f7] text-[#16587b]">
-                  <UserPlus size={23} />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <h3 className="font-bold text-gray-900">
-                    New Patient?
-                  </h3>
-                  <p className="mt-1 text-xs leading-5 text-gray-500 sm:text-sm">
-                    Register your details and book an appointment.
-                  </p>
-                </div>
-                <span className="text-xl text-gray-400 transition group-hover:translate-x-1 group-hover:text-[#16587b]">
-                  →
-                </span>
-              </button>
-
-
-            </div>
-          )}
-
-          {/* REGISTERED PATIENT LOGIN */}
-          {step === "login" && (
-            <form onSubmit={handleLogin} className="space-y-5">
-              <div className="flex gap-3 rounded-xl border border-[#d4e7f0] bg-[#edf6fa] p-4">
-                <ShieldCheck className="mt-0.5 shrink-0 text-[#16587b]" size={22} />
-                <p className="text-sm leading-6 text-[#104662]">
-                  Enter the details associated with your registered
-                  patient profile.
-                </p>
-              </div>
-
-              <div>
-                <label className={labelClass}>Mobile Number</label>
-                <div className="flex overflow-hidden rounded-xl border border-gray-200 focus-within:border-[#16587b] focus-within:ring-2 focus-within:ring-blue-100">
-                  <span className="flex items-center border-r border-gray-200 bg-gray-50 px-4 text-sm font-medium text-gray-600">
-                    +91
-                  </span>
-                  <input
-                    type="tel"
-                    inputMode="numeric"
-                    autoComplete="tel-national"
-                    maxLength={10}
-                    value={phone}
-                    onChange={(e) =>
-                      setPhone(e.target.value.replace(/\D/g, ""))
-                    }
-                    placeholder="10-digit mobile number"
-                    className="min-w-0 flex-1 px-4 py-3 text-sm outline-none"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className={labelClass}>Aadhaar Number</label>
-                <input
-                  type="password"
-                  inputMode="numeric"
-                  autoComplete="off"
-                  maxLength={12}
-                  value={aadhaar}
-                  onChange={(e) =>
-                    setAadhaar(e.target.value.replace(/\D/g, ""))
-                  }
-                  placeholder="Enter 12-digit test number"
-                  className={inputClass}
-                  required
-                />
-                <p className="mt-2 text-xs leading-5 text-gray-400">
-                  Use fictional demo details only. Never enter your
-                  real Aadhaar number in this prototype.
-                </p>
-              </div>
-
-              {error && (
-                <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm text-red-600">
-                  {error}
-                </p>
-              )}
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full rounded-xl bg-[#16587b] px-5 py-3.5 font-semibold text-white transition hover:bg-[#104662] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {loading ? "Verifying..." : "Verify & Continue"}
-              </button>
-
-              <p className="text-center text-sm text-gray-500">
-                New patient?{" "}
-                <button
-                  type="button"
-                  onClick={() => changeStep("register")}
-                  className="font-semibold text-[#16587b] hover:underline"
-                >
-                  Register here
+                <button onClick={() => { setStep("login"); setError(""); }} className="group flex w-full items-center gap-3 rounded-xl border border-[#dceaf1] bg-white p-4 text-left transition hover:border-[#84b3ce] hover:bg-[#f5fafc]">
+                  <span className="rounded-lg bg-[#edf6fa] p-2.5 text-[#16587b]"><UserRound size={19}/></span>
+                  <span className="flex-1"><span className="block text-sm font-medium">Already registered</span><span className="mt-1 block text-xs text-gray-500">Login with mobile and Aadhaar</span></span><span className="text-[#16587b] transition group-hover:translate-x-0.5">→</span>
                 </button>
-              </p>
-            </form>
-          )}
-
-          {/* NEW PATIENT REGISTRATION */}
-          {step === "register" && (
-            <form onSubmit={handleRegister} className="space-y-4">
-              <div>
-                <label className={labelClass}>Full Name</label>
-                <input
-                  name="name"
-                  value={register.name}
-                  onChange={updateRegister}
-                  placeholder="Enter full name"
-                  className={inputClass}
-                  required
-                  maxLength={80}
-                />
-              </div>
-
-              <div>
-                <label className={labelClass}>Mobile Number</label>
-                <div className="flex overflow-hidden rounded-xl border border-gray-200 focus-within:border-[#16587b] focus-within:ring-2 focus-within:ring-blue-100">
-                  <span className="flex items-center border-r border-gray-200 bg-gray-50 px-4 text-sm text-gray-600">
-                    +91
-                  </span>
-                  <input
-                    name="phone"
-                    type="tel"
-                    inputMode="numeric"
-                    value={register.phone}
-                    onChange={(e) =>
-                      setRegister((prev) => ({
-                        ...prev,
-                        phone: e.target.value.replace(/\D/g, "").slice(0, 10),
-                      }))
-                    }
-                    placeholder="10-digit mobile number"
-                    className="min-w-0 flex-1 px-4 py-3 text-sm outline-none"
-                    required
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className={labelClass}>Aadhaar Number</label>
-                <input
-                  name="aadhaar"
-                  type="password"
-                  inputMode="numeric"
-                  autoComplete="off"
-                  value={register.aadhaar}
-                  onChange={(e) =>
-                    setRegister((prev) => ({
-                      ...prev,
-                      aadhaar: e.target.value.replace(/\D/g, "").slice(0, 12),
-                    }))
-                  }
-                  placeholder="12-digit test number"
-                  className={inputClass}
-                  required
-                />
-                <p className="mt-1 text-xs text-gray-400">
-                  Use fictional data only in this demo.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <div>
-                  <label className={labelClass}>Gender</label>
-                  <select
-                    name="gender"
-                    value={register.gender}
-                    onChange={updateRegister}
-                    className={inputClass}
-                    required
-                  >
-                    <option value="">Select gender</option>
-                    <option value="Male">Male</option>
-                    <option value="Female">Female</option>
-                    <option value="Other">Other</option>
-                    <option value="Prefer not to say">Prefer not to say</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className={labelClass}>Date of Birth</label>
-                  <input
-                    name="dob"
-                    type="date"
-                    max={getToday()}
-                    value={register.dob}
-                    onChange={updateRegister}
-                    className={inputClass}
-                    required
-                  />
-                </div>
-              </div>
-
-              {error && (
-                <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm text-red-600">
-                  {error}
-                </p>
-              )}
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full rounded-xl bg-[#16587b] px-5 py-3.5 font-semibold text-white transition hover:bg-[#104662] disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {loading ? "Registering..." : "Register & Continue"}
-              </button>
-
-              <p className="text-center text-sm text-gray-500">
-                Already registered?{" "}
-                <button
-                  type="button"
-                  onClick={() => changeStep("login")}
-                  className="font-semibold text-[#16587b] hover:underline"
-                >
-                  Login here
+                <button onClick={() => { setStep("register"); setError(""); }} className="group flex w-full items-center gap-3 rounded-xl border border-[#dceaf1] bg-white p-4 text-left transition hover:border-[#84b3ce] hover:bg-[#f5fafc]">
+                  <span className="rounded-lg bg-[#edf6fa] p-2.5 text-[#16587b]"><UserPlus size={19}/></span>
+                  <span className="flex-1"><span className="block text-sm font-medium">New patient</span><span className="mt-1 block text-xs text-gray-500">Register, then book an appointment</span></span><span className="text-[#16587b] transition group-hover:translate-x-0.5">→</span>
                 </button>
-              </p>
-            </form>
-          )}
-
-          {/* APPOINTMENT FORM */}
-          {step === "appointment" && patient && (
-            <form onSubmit={handleBooking} className="space-y-5">
-              <div className="flex items-center gap-3 rounded-2xl border border-green-100 bg-green-50 p-4">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-700">
-                  <CheckCircle2 size={23} />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-green-700">
-                    Patient Verified
-                  </p>
-                  <h3 className="mt-1 truncate font-bold text-gray-900">
-                    {patient.name}
-                  </h3>
-                  <p className="mt-1 text-xs text-gray-500">
-                    +91 {patient.phone}
-                  </p>
-                </div>
               </div>
+            )}
 
-              <div>
-                <label className={labelClass}>
-                  <span className="inline-flex items-center gap-2">
-                    <Stethoscope size={17} className="text-[#16587b]" />
-                    Select Doctor
-                  </span>
-                </label>
-                <div className="space-y-2">
-                  {doctors.map((doctor) => {
-                    const doctorId = doctor.id || doctor._id;
-                    return (
-                    <label
-                      key={doctorId}
-                      className={`flex cursor-pointer items-center gap-3 rounded-xl border p-3 transition ${
-                        appointment.doctor === doctorId
-                          ? "border-[#16587b] bg-[#edf6fa]"
-                          : "border-gray-200 hover:border-[#a7cadc]"
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name="doctor"
-                        value={doctorId}
-                        checked={appointment.doctor === doctorId}
-                        onChange={updateAppointment}
-                        className="h-4 w-4 accent-[#16587b]"
-                      />
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#e2f0f7] text-[#16587b]">
-                        <UserRound size={20} />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-sm font-semibold text-gray-900">
-                          {doctor.name}
-                        </p>
-                        <p className="mt-0.5 text-xs text-gray-500">
-                          {doctor.specialization || doctor.specialty || doctor.department || "Consultation"}
-                        </p>
-                        {doctor.qualification && (
-                          <p className="mt-1 text-xs text-gray-400">{doctor.qualification}</p>
-                        )}
-                      </div>
-                    </label>
-                    );
-                  })}
+            {step === "login" && (
+              <form onSubmit={handleLogin} className="space-y-4">
+                <div className="flex items-start gap-2 rounded-xl border border-[#dceaf1] bg-[#edf6fa] p-3 text-xs leading-5 text-[#16587b]"><ShieldCheck size={17} className="mt-0.5 shrink-0"/> Use the same credentials registered with City Hospital.</div>
+                <div><label className={labelClass} htmlFor="patient-phone">Mobile number</label><input id="patient-phone" className={inputClass} type="tel" inputMode="numeric" maxLength={10} autoComplete="tel" value={phone} onChange={(e)=>setPhone(e.target.value.replace(/\D/g,""))} placeholder="10-digit mobile number" required/></div>
+                <div><label className={labelClass} htmlFor="patient-aadhaar">Aadhaar number</label><input id="patient-aadhaar" className={inputClass} type="password" inputMode="numeric" maxLength={12} autoComplete="off" value={aadhaar} onChange={(e)=>setAadhaar(e.target.value.replace(/\D/g,""))} placeholder="12-digit Aadhaar number" required/><p className="mt-1.5 text-[11px] leading-4 text-gray-500">Used only for verification; it is not saved in browser storage.</p></div>
+                <button disabled={loading} className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#16587b] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#123b50] focus:ring-4 focus:ring-[#16587b]/15 disabled:opacity-60">{loading && <RefreshCw size={15} className="animate-spin"/>}{loading ? "Verifying…" : "Verify and continue"}</button>
+                <p className="text-center text-xs text-gray-500">New patient? <button type="button" onClick={()=>{setStep("register");setError("");}} className="font-medium text-[#16587b] hover:text-[#a9002d] hover:underline">Register here</button></p>
+              </form>
+            )}
+
+            {step === "register" && (
+              <form onSubmit={handleRegister} className="space-y-3.5">
+                <div><label className={labelClass} htmlFor="register-name">Full name</label><input id="register-name" name="name" value={register.name} onChange={(e)=>setRegister({...register,name:e.target.value})} className={inputClass} autoComplete="name" maxLength={100} placeholder="Patient's full name" required/></div>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div><label className={labelClass} htmlFor="register-phone">Mobile number</label><input id="register-phone" type="tel" inputMode="numeric" maxLength={10} value={register.phone} onChange={(e)=>setRegister({...register,phone:e.target.value.replace(/\D/g,"")})} className={inputClass} placeholder="10 digits" required/></div>
+                  <div><label className={labelClass} htmlFor="register-aadhaar">Aadhaar number</label><input id="register-aadhaar" type="password" inputMode="numeric" maxLength={12} value={register.aadhaar} onChange={(e)=>setRegister({...register,aadhaar:e.target.value.replace(/\D/g,"")})} className={inputClass} placeholder="12 digits" required/></div>
                 </div>
-              </div>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div><label className={labelClass} htmlFor="register-dob">Date of birth (optional)</label><input id="register-dob" type="date" value={register.dob} onChange={(e)=>setRegister({...register,dob:e.target.value})} className={inputClass}/></div>
+                  <div><label className={labelClass} htmlFor="register-gender">Gender (optional)</label><select id="register-gender" value={register.gender} onChange={(e)=>setRegister({...register,gender:e.target.value})} className={inputClass}><option value="">Select gender</option><option>Male</option><option>Female</option><option>Other</option></select></div>
+                </div>
+                <p className="text-[11px] leading-4 text-gray-500">Aadhaar is sent to the backend for verification and is not stored in browser storage.</p>
+                <button disabled={loading} className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#16587b] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#123b50] disabled:opacity-60">{loading && <RefreshCw size={15} className="animate-spin"/>}{loading ? "Creating account…" : "Register and continue"}</button>
+              </form>
+            )}
 
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {step === "appointment" && (
+              <form onSubmit={handleBooking} className="space-y-4">
+                <div className="flex items-center gap-3 rounded-xl border border-[#dceaf1] bg-white p-3">
+                  <span className="rounded-lg bg-[#edf6fa] p-2.5 text-[#16587b]"><UserRound size={18}/></span>
+                  <div className="min-w-0 flex-1"><p className="text-xs text-gray-500">Booking for</p><p className="truncate text-sm font-medium text-[#123b50]">{patient?.name || "Logged-in patient"}</p><p className="mt-0.5 text-xs text-gray-500">{patient?.phone || "Patient session verified"}</p></div>
+                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-1 text-[10px] font-medium text-emerald-700"><CheckCircle2 size={12}/> Verified</span>
+                </div>
                 <div>
-                  <label className={labelClass}>
-                    <span className="inline-flex items-center gap-2">
-                      <CalendarDays size={16} className="text-[#16587b]" />
-                      Appointment Date
-                    </span>
-                  </label>
-                  <input
-                    type="date"
-                    name="date"
-                    min={getToday()}
-                    value={appointment.date}
-                    onChange={updateAppointment}
-                    className={inputClass}
-                    required
-                  />
+                  <label className={labelClass} htmlFor="appointment-doctor">Choose doctor</label>
+                  <div className="relative"><Stethoscope size={16} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#16587b]"/><select id="appointment-doctor" name="doctor" value={appointment.doctor} onChange={updateAppointment} className={`${inputClass} pl-9`} required disabled={loadingDoctors}><option value="">{loadingDoctors ? "Loading doctors…" : "Select a doctor"}</option>{doctors.map((doctor)=><option key={doctor._id || doctor.id} value={doctor._id || doctor.id}>{doctor.name} — {doctor.specialization || doctor.department || doctor.qualification}</option>)}</select></div>
+                  {loadingDoctors && <p className="mt-1.5 text-xs text-gray-500">Fetching active doctors…</p>}
                 </div>
-
-                <div>
-                  <label className={labelClass}>
-                    <span className="inline-flex items-center gap-2">
-                      <Clock3 size={16} className="text-[#16587b]" />
-                      Time Slot
-                    </span>
-                  </label>
-                  <select
-                    name="time"
-                    value={appointment.time}
-                    onChange={updateAppointment}
-                    className={inputClass}
-                    required
-                  >
-                    <option value="">Select time</option>
-                    {timeSlots.map((slot) => (
-                      <option value={slot} key={slot}>
-                        {slot}
-                      </option>
-                    ))}
-                  </select>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div><label className={labelClass} htmlFor="appointment-date">Appointment date</label><div className="relative"><CalendarDays size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#16587b]"/><input id="appointment-date" name="date" type="date" min={todayString()} value={appointment.date} onChange={updateAppointment} className={`${inputClass} pl-9`} required/></div></div>
+                  <div><label className={labelClass} htmlFor="appointment-time">Appointment time</label><div className="relative"><Clock3 size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#16587b]"/><select id="appointment-time" name="time" value={appointment.time} onChange={updateAppointment} className={`${inputClass} pl-9`} required><option value="">Select a time</option>{TIME_SLOTS.map((time)=><option key={time} value={time}>{time}</option>)}</select></div></div>
                 </div>
-              </div>
+                <div><label className={labelClass} htmlFor="appointment-reason">Reason for visit</label><textarea id="appointment-reason" name="reason" rows={3} maxLength={500} value={appointment.reason} onChange={updateAppointment} className={`${inputClass} resize-y`} placeholder="Briefly describe why you need a consultation" required/></div>
+                <div className="rounded-xl bg-[#edf6fa] px-3.5 py-3 text-xs leading-5 text-[#16587b]">Booking is confirmed only after the hospital server accepts the request. If a time slot is already booked, choose another time.</div>
+                <button disabled={loading || loadingDoctors || doctors.length === 0} className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#16587b] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#123b50] focus:ring-4 focus:ring-[#16587b]/15 disabled:cursor-not-allowed disabled:opacity-60">{loading && <RefreshCw size={15} className="animate-spin"/>}{loading ? "Booking appointment…" : "Confirm appointment"}</button>
+              </form>
+            )}
 
-              <div>
-                <label className={labelClass}>
-                  <span className="inline-flex items-center gap-2">
-                    <FileText size={16} className="text-[#16587b]" />
-                    Reason / Symptoms
-                  </span>
-                </label>
-                <textarea
-                  name="reason"
-                  value={appointment.reason}
-                  onChange={updateAppointment}
-                  rows={3}
-                  maxLength={500}
-                  placeholder="Briefly describe your symptoms or reason for visit..."
-                  className={`${inputClass} resize-none`}
-                  required
-                />
-                <p className="mt-1 text-right text-xs text-gray-400">
-                  {appointment.reason.length}/500
-                </p>
-              </div>
-
-              <div>
-                <label className={labelClass}>Payment Method</label>
-                <div className="grid grid-cols-2 gap-3">
-                  <label
-                    className={`flex cursor-pointer items-center gap-3 rounded-xl border p-4 transition ${
-                      appointment.payment === "cash"
-                        ? "border-[#16587b] bg-[#edf6fa]"
-                        : "border-gray-200"
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="payment"
-                      value="cash"
-                      checked={appointment.payment === "cash"}
-                      onChange={updateAppointment}
-                      className="h-4 w-4 accent-[#16587b]"
-                    />
-                    <Banknote size={20} className="text-[#16587b]" />
-                    <span className="text-sm font-semibold text-gray-800">
-                      Cash
-                    </span>
-                  </label>
-
-                  <label
-                    className={`flex cursor-pointer items-center gap-3 rounded-xl border p-4 transition ${
-                      appointment.payment === "online"
-                        ? "border-[#16587b] bg-[#edf6fa]"
-                        : "border-gray-200"
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="payment"
-                      value="online"
-                      checked={appointment.payment === "online"}
-                      onChange={updateAppointment}
-                      className="h-4 w-4 accent-[#16587b]"
-                    />
-                    <CreditCard size={20} className="text-[#16587b]" />
-                    <span className="text-sm font-semibold text-gray-800">
-                      Online
-                    </span>
-                  </label>
-                </div>
-                {appointment.payment === "online" && (
-                  <p className="mt-2 text-xs text-gray-500">
-                    Online payment is a UI demo only. No payment will be
-                    processed.
-                  </p>
-                )}
-              </div>
-
-              {error && (
-                <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm text-red-600">
-                  {error}
-                </p>
-              )}
-
-              {doctors.length === 0 && (
-                <p role="status" className="rounded-xl bg-amber-50 p-3 text-sm text-amber-800">
-                  No active doctors are available right now. Please try again later.
-                </p>
-              )}
-
-              <button
-                type="submit"
-                disabled={loading || doctors.length === 0}
-                className="w-full rounded-xl bg-[#16587b] px-5 py-3.5 font-semibold text-white shadow-lg shadow-[#16587b]/20 transition hover:bg-[#104662] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {loading ? "Booking..." : "Confirm Appointment"}
-              </button>
-            </form>
-          )}
-
-          {/* SUCCESS */}
-          {step === "success" && confirmation && (
-            <div className="py-4 text-center">
-              <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-green-100 text-green-600">
-                <CheckCircle2 size={44} />
-              </div>
-
-              <h3 className="text-2xl font-bold text-gray-900">
-                Appointment Booked!
-              </h3>
-              <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-gray-500">
-                Your appointment has been saved successfully.
-              </p>
-
-              <div className="my-6 rounded-2xl border border-gray-200 bg-gray-50 p-5 text-left">
-                <div className="mb-4 flex items-center justify-between border-b border-gray-200 pb-3">
-                  <span className="text-sm text-gray-500">
-                    Appointment ID
-                  </span>
-                  <span className="text-sm font-bold text-[#16587b]">
-                    {confirmation.id}
-                  </span>
-                </div>
-
-                {[
-                  ["Patient", confirmation.patient],
-                  ["Doctor", confirmation.doctor],
-                  ["Date", confirmation.date],
-                  ["Time", confirmation.time],
-                  ["Payment", confirmation.payment === "cash" ? "Cash at hospital" : "Online (demo)"],
-                ].map(([label, value]) => (
-                  <div
-                    key={label}
-                    className="flex items-start justify-between gap-3 py-2"
-                  >
-                    <span className="text-sm text-gray-500">{label}</span>
-                    <span className="text-right text-sm font-semibold text-gray-900">
-                      {value}
-                    </span>
+            {step === "success" && confirmation && (
+              <div className="mx-auto max-w-md py-3">
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50 text-emerald-600"><CheckCircle2 size={29}/></div>
+                <h3 className="mt-3 text-center text-lg font-semibold text-[#123b50]">Appointment booked</h3>
+                <p className="mt-1 text-center text-xs text-gray-500">Your booking has been saved successfully.</p>
+                <div className="mt-5 rounded-xl border border-[#dceaf1] bg-white p-4">
+                  <div className="flex items-center justify-between border-b border-[#edf2f5] pb-3"><span className="text-xs text-gray-500">Appointment ID</span><span className="text-sm font-semibold text-[#16587b]">{confirmation.id}</span></div>
+                  <div className="mt-3 space-y-3 text-sm">
+                    <div><p className="text-[11px] text-gray-500">Patient</p><p className="mt-0.5">{confirmation.patient}</p></div>
+                    <div><p className="text-[11px] text-gray-500">Doctor</p><p className="mt-0.5">{confirmation.doctor}</p><p className="text-xs text-gray-500">{confirmation.specialty}</p></div>
+                    <div className="grid grid-cols-2 gap-3"><div><p className="text-[11px] text-gray-500">Date</p><p className="mt-0.5">{new Date(`${confirmation.date}T00:00:00`).toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"})}</p></div><div><p className="text-[11px] text-gray-500">Time</p><p className="mt-0.5">{confirmation.time}</p></div></div>
                   </div>
-                ))}
+                </div>
+                <button onClick={close} className="mt-5 w-full rounded-xl bg-[#16587b] px-4 py-2.5 text-sm font-medium text-white transition hover:bg-[#123b50]">Done</button>
               </div>
-
-              <p className="mb-5 rounded-xl bg-amber-50 p-3 text-xs leading-5 text-amber-800">
-                Your appointment has been recorded by the system. Please contact the hospital if you need to confirm availability or payment details.
-              </p>
-
-              <button
-                type="button"
-                onClick={handleClose}
-                className="w-full rounded-xl bg-[#16587b] px-5 py-3.5 font-semibold text-white transition hover:bg-[#104662]"
-              >
-                Done
-              </button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
-        </div>
-      </div>
+      </section>
     </div>
   );
 }

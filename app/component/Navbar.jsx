@@ -165,16 +165,16 @@ export default function Navbar() {
       href === "/" ? pathname === "/" : pathname.startsWith(href);
     return `${underlineBase} ${
       active
-        ? "text-[#16587b] after:bg-[#a9002d]"
-        : "text-[#16587b] after:bg-transparent hover:after:bg-[#a9002d] hover:bg-[#f0f7fa]"
+        ? "bg-[#eaf3f8] text-[#16587b] after:bg-[#a9002d]"
+        : "bg-transparent text-[#16587b] after:bg-transparent hover:after:bg-[#a9002d] hover:bg-[#f0f7fa]"
     }`;
   }
 
   function menuToggleClass(open) {
     return `${underlineBase} ${
       open
-        ? "text-[#16587b] after:bg-[#a9002d]"
-        : "text-[#16587b] after:bg-transparent hover:bg-[#f0f7fa] hover:after:bg-[#a9002d]"
+        ? "bg-[#eaf3f8] text-[#16587b] after:bg-[#a9002d]"
+        : "bg-transparent text-[#16587b] after:bg-transparent hover:bg-[#f0f7fa] hover:after:bg-[#a9002d]"
     }`;
   }
 
@@ -291,7 +291,7 @@ export default function Navbar() {
                   setExploreOpen(false);
                 }}
                 aria-expanded={loginOpen}
-                className={menuToggleClass(loginOpen)}
+                className={menuToggleClass(loginOpen || pathname === "/patient-login")}
               >
                 <FiLogIn size={20} /> Login
                 <FiChevronDown
@@ -441,7 +441,11 @@ export default function Navbar() {
                     setMobileExploreOpen(false);
                   }}
                   aria-expanded={mobileLoginOpen}
-                  className="flex w-full items-center justify-between rounded-xl px-3 py-3.5 text-base font-bold text-[#16587b] hover:bg-[#f0f7fa]"
+                  className={`flex w-full items-center justify-between rounded-xl px-3 py-3.5 text-base font-bold transition ${
+                    mobileLoginOpen || pathname === "/patient-login"
+                      ? "bg-[#eaf3f8] text-[#16587b]"
+                      : "text-[#16587b] hover:bg-[#f0f7fa]"
+                  }`}
                 >
                   <span className="flex items-center gap-3"><FiLogIn size={19} /> Login</span>
                   <FiChevronDown className={mobileLoginOpen ? "rotate-180" : ""} />
@@ -475,7 +479,11 @@ export default function Navbar() {
                   setMobileLoginOpen(false);
                 }}
                 aria-expanded={mobileExploreOpen}
-                className="flex w-full items-center justify-between rounded-xl px-3 py-3.5 text-base font-bold text-[#16587b] hover:bg-[#f0f7fa]"
+                className={`flex w-full items-center justify-between rounded-xl px-3 py-3.5 text-base font-bold transition ${
+                  mobileExploreOpen
+                    ? "bg-[#eaf3f8] text-[#16587b]"
+                    : "text-[#16587b] hover:bg-[#f0f7fa]"
+                }`}
               >
                 <span className="flex items-center gap-3"><FiCompass size={19} /> Explore</span>
                 <FiChevronDown className={mobileExploreOpen ? "rotate-180" : ""} />

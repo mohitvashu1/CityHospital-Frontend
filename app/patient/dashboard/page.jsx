@@ -309,11 +309,12 @@ export default function PatientDashboard() {
               </p>
 
               <button
-                onClick={() => router.push("/appointment")}
-                className="mt-5 rounded-xl bg-[#16587b] px-5 py-3 text-sm font-semibold text-white hover:bg-[#104662]"
-              >
-                Book Appointment
-              </button>
+  onClick={() => router.push("/appointment")}
+  className="inline-flex items-center gap-2 rounded-xl bg-[#16587b] px-4 py-2.5 text-sm font-medium text-white transition hover:-translate-y-0.5 hover:bg-[#123b50] hover:shadow-md focus:outline-none focus:ring-4 focus:ring-[#16587b]/15"
+>
+  <CalendarDays size={16} />
+  Book Appointment
+</button>
             </div>
           ) : (
             <div className="mt-5 space-y-4">

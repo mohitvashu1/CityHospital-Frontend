@@ -1,11 +1,10 @@
-
 "use client";
 
 import { useState } from "react";
 import { CalendarDays } from "lucide-react";
 import BookAppointmentModal from "./BookAppointmentModal";
 
-export default function BookAppointmentEntry() {
+export default function BookAppointmentEntry({ className = "" }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -13,16 +12,12 @@ export default function BookAppointmentEntry() {
       <button
         type="button"
         onClick={() => setIsOpen(true)}
-        className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#16587b] px-5 py-3 text-sm font-semibold text-white shadow-md shadow-[#16587b]/20 transition hover:bg-[#104662] active:scale-[0.98]"
+        className={`inline-flex items-center justify-center gap-2 rounded-xl bg-[#16587b] px-4 py-2.5 text-sm font-medium text-white transition duration-200 hover:-translate-y-0.5 hover:bg-[#123b50] hover:shadow-md focus:outline-none focus:ring-4 focus:ring-[#16587b]/15 ${className}`}
       >
-        <CalendarDays size={18} />
-        Book Appointment
+        <CalendarDays size={16} />
+        Book appointment
       </button>
-
-      <BookAppointmentModal
-        isOpen={isOpen}
-        onClose={() => setIsOpen(false)}
-      />
+      <BookAppointmentModal isOpen={isOpen} onClose={() => setIsOpen(false)} />
     </>
   );
 }

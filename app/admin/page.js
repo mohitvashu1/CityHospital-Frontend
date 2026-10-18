@@ -2,12 +2,11 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   ShieldCheck,
   Stethoscope,
   ClipboardList,
-  FlaskConical,
-  Pill,
   ArrowLeft,
   LockKeyhole,
   UserRound,
@@ -18,21 +17,21 @@ import {
 const roles = [
   {
     id: "SUPER_ADMIN",
-    title: "Super Admin",
+    title: "Management",
     description: "Manage hospital operations and staff",
     icon: ShieldCheck,
     color: "text-red-700",
     bg: "bg-red-50",
     permissions: [
-  "Manage doctors",
-  "Manage staff",
-  "Change / reset passwords of all users",
-  "Manage user roles and access",
-  "Manage medicines",
-  "Manage tests",
-  "View reports",
-  "Manage hospital settings",
-],
+      "Manage doctors",
+      "Manage staff",
+      "Change / reset passwords of all users",
+      "Manage user roles and access",
+      "Manage medicines",
+      "Manage tests",
+      "View reports",
+      "Manage hospital settings",
+    ],
   },
   {
     id: "DOCTOR",
@@ -52,7 +51,7 @@ const roles = [
   },
   {
     id: "RECEPTIONIST",
-    title: "Receptionist",
+    title: "Receptionist/Staff",
     description: "Patient registration and appointment desk",
     icon: ClipboardList,
     color: "text-green-700",
@@ -64,45 +63,24 @@ const roles = [
       "Print finalized prescriptions",
     ],
   },
-  {
-    id: "LAB_STAFF",
-    title: "Lab Staff",
-    description: "Investigations and laboratory reports",
-    icon: FlaskConical,
-    color: "text-purple-700",
-    bg: "bg-purple-50",
-    permissions: [
-      "View requested tests",
-      "Enter test results",
-      "Upload reports",
-    ],
-  },
-  {
-    id: "PHARMACY",
-    title: "Pharmacy",
-    description: "Prescription dispensing and medicine counter",
-    icon: Pill,
-    color: "text-orange-700",
-    bg: "bg-orange-50",
-    permissions: [
-      "View authorized prescriptions",
-      "Manage dispensing",
-      "Manage inventory, if enabled",
-    ],
-  },
 ];
 
 export default function AdminPage() {
+  const router = useRouter();
+
   const [selectedRole, setSelectedRole] = useState(null);
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [message, setMessage] = useState("");
 
-  const selected = roles.find((role) => role.id === selectedRole);
+  const selected = roles.find(
+    (role) => role.id === selectedRole
+  );
 
   function handleLogin(e) {
     e.preventDefault();
+
     setMessage(
       "Login is not connected yet. Backend authentication will be added later."
     );
@@ -113,11 +91,22 @@ export default function AdminPage() {
     setMessage("");
     setUserId("");
     setPassword("");
+    setShowPassword(false);
+  }
+
+  function handleRoleClick(roleId) {
+    if (roleId === "DOCTOR") {
+      router.push("/doctor/login");
+      return;
+    }
+
+    chooseRole(roleId);
   }
 
   return (
     <main className="min-h-screen bg-[#f7fafc] px-4 py-12">
       <div className="mx-auto w-full max-w-5xl">
+        {/* Header */}
         <div className="mb-8 text-center">
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#16587b] text-white shadow-lg">
             <ShieldCheck size={34} />
@@ -128,7 +117,7 @@ export default function AdminPage() {
           </p>
 
           <h1 className="text-3xl font-bold text-[#123b50] sm:text-4xl">
-            Staff & Admin Portal
+            Staff &amp; Admin Portal
           </h1>
 
           <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-gray-600 sm:text-base">
@@ -136,6 +125,7 @@ export default function AdminPage() {
           </p>
         </div>
 
+        {/* Role Selection */}
         {!selectedRole ? (
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {roles.map((role) => {
@@ -145,7 +135,7 @@ export default function AdminPage() {
                 <button
                   key={role.id}
                   type="button"
-                  onClick={() => chooseRole(role.id)}
+                  onClick={() => handleRoleClick(role.id)}
                   className="group rounded-2xl border border-[#dceaf1] bg-white p-6 text-left shadow-sm transition duration-300 hover:-translate-y-1 hover:border-[#16587b] hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#16587b]"
                 >
                   <div
@@ -166,6 +156,7 @@ export default function AdminPage() {
                     <span className="text-sm font-semibold text-[#16587b]">
                       Continue to login
                     </span>
+
                     <span className="text-xl text-[#16587b] transition group-hover:translate-x-1">
                       →
                     </span>
@@ -176,10 +167,14 @@ export default function AdminPage() {
           </div>
         ) : (
           <div className="mx-auto grid max-w-4xl overflow-hidden rounded-2xl border border-[#dceaf1] bg-white shadow-xl md:grid-cols-2">
+            {/* Portal Information */}
             <section className="bg-[#16587b] p-7 text-white sm:p-9">
               <button
                 type="button"
-                onClick={() => setSelectedRole(null)}
+                onClick={() => {
+                  setSelectedRole(null);
+                  setMessage("");
+                }}
                 className="mb-10 inline-flex items-center gap-2 text-sm text-white/80 transition hover:text-white"
               >
                 <ArrowLeft size={17} />
@@ -187,7 +182,11 @@ export default function AdminPage() {
               </button>
 
               <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-white/15">
-                {selected && <selected.icon size={32} />}
+                {selected &&
+                  (() => {
+                    const Icon = selected.icon;
+                    return <Icon size={32} />;
+                  })()}
               </div>
 
               <p className="text-sm font-medium uppercase tracking-widest text-white/70">
@@ -203,7 +202,10 @@ export default function AdminPage() {
               </p>
 
               <div className="mt-9 border-t border-white/20 pt-6">
-                <h3 className="mb-4 font-semibold">Portal access</h3>
+                <h3 className="mb-4 font-semibold">
+                  Portal access
+                </h3>
+
                 <ul className="space-y-3">
                   {selected?.permissions.map((permission) => (
                     <li
@@ -218,11 +220,13 @@ export default function AdminPage() {
               </div>
             </section>
 
+            {/* Login Form */}
             <section className="p-7 sm:p-9">
               <div className="mb-7">
                 <h3 className="text-2xl font-bold text-[#123b50]">
                   Welcome back
                 </h3>
+
                 <p className="mt-2 text-sm text-gray-600">
                   Enter your credentials to continue.
                 </p>
@@ -236,11 +240,13 @@ export default function AdminPage() {
                   >
                     User ID / Email / Phone
                   </label>
+
                   <div className="relative">
                     <UserRound
                       size={18}
                       className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
                     />
+
                     <input
                       id="userId"
                       type="text"
@@ -261,11 +267,13 @@ export default function AdminPage() {
                   >
                     Password
                   </label>
+
                   <div className="relative">
                     <LockKeyhole
                       size={18}
                       className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
                     />
+
                     <input
                       id="password"
                       type={showPassword ? "text" : "password"}
@@ -276,10 +284,15 @@ export default function AdminPage() {
                       required
                       className="w-full rounded-xl border border-[#dceaf1] py-3 pl-10 pr-12 text-sm text-[#123b50] outline-none transition focus:border-[#16587b] focus:ring-2 focus:ring-[#16587b]/15"
                     />
+
                     <button
                       type="button"
-                      onClick={() => setShowPassword((prev) => !prev)}
-                      aria-label={showPassword ? "Hide password" : "Show password"}
+                      onClick={() =>
+                        setShowPassword((prev) => !prev)
+                      }
+                      aria-label={
+                        showPassword ? "Hide password" : "Show password"
+                      }
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-[#16587b]"
                     >
                       {showPassword ? (
@@ -317,6 +330,7 @@ export default function AdminPage() {
           </div>
         )}
 
+        {/* Footer */}
         <p className="mt-8 text-center text-xs text-gray-500">
           © {new Date().getFullYear()} City Hospital. All rights reserved.
         </p>

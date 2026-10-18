@@ -9,7 +9,7 @@ export default function AppointmentPage() {
   return (
     <BookAppointmentModal
       isOpen={true}
-      onClose={() => router.push("/")}
+      onClose={() => router.push("/patient/dashboard")}
     />
   );
 }
