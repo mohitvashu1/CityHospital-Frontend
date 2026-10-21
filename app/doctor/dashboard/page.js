@@ -60,6 +60,7 @@ export default function DoctorDashboardPage() {
   const [doctor, setDoctor] = useState(null);
   const [appointments, setAppointments] = useState([]);
   const [query, setQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("ALL");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedAppointment, setSelectedAppointment] = useState(null);
@@ -102,15 +103,60 @@ export default function DoctorDashboardPage() {
 
   const filteredAppointments = useMemo(() => {
     const term = query.trim().toLowerCase();
-    if (!term) return appointments;
+
     return appointments.filter((item) => {
+      const status = String(
+        item.status || item.appointmentStatus || "PENDING"
+      )
+        .trim()
+        .toUpperCase()
+        .replace(/[\s-]+/g, "_");
+
+      const completedStatuses = ["COMPLETED", "DONE"];
+      const cancelledStatuses = ["CANCELLED", "CANCELED", "REJECTED"];
+      const pendingStatuses = [
+        "BOOKED",
+        "PENDING",
+        "CONFIRMED",
+        "APPROVED",
+        "IN_CONSULTATION",
+        "IN_PROGRESS",
+      ];
+
+      let matchesStatus = true;
+      if (statusFilter === "PENDING") {
+        matchesStatus = pendingStatuses.includes(status) && !cancelledStatuses.includes(status);
+      } else if (statusFilter === "COMPLETED") {
+        matchesStatus = completedStatuses.includes(status);
+      }
+
+      if (!matchesStatus) return false;
+      if (!term) return true;
+
       const patient = getPatient(item);
-      return [patient.name, patient.fullName, patient.phone, patient.mobile, patient.patientId, patient.uhid,
-        item.patientName, item.patientPhone, item.phone, item.mobile, item.patientId, item.uhid,
-        item.tokenNumber, item.appointmentNumber, item._id]
-        .some((value) => String(value ?? "").toLowerCase().includes(term));
+      const searchableValues = [
+        patient.name,
+        patient.fullName,
+        patient.phone,
+        patient.mobile,
+        patient.patientId,
+        patient.uhid,
+        item.patientName,
+        item.patientPhone,
+        item.phone,
+        item.mobile,
+        item.patientId,
+        item.uhid,
+        item.tokenNumber,
+        item.appointmentNumber,
+        item._id,
+      ];
+
+      return searchableValues.some((value) =>
+        String(value ?? "").toLowerCase().includes(term)
+      );
     });
-  }, [appointments, query]);
+  }, [appointments, query, statusFilter]);
 
   function closePanel() {
     setSelectedAppointment(null); setPanelMode(""); setPatientHistory(null); setHistoryError("");
@@ -239,8 +285,8 @@ export default function DoctorDashboardPage() {
         if (!finalResponse.ok || finalData.success === false) throw new Error(finalData.message || `Saved as draft, but finalization failed (${finalResponse.status}).`);
         setConsultationStatus("FINALIZED"); setFormMessage("Consultation finalized and appointment marked completed.");
       } else {
-        setFormMessage(consultationId ? "Consultation draft updated." : "Consultation saved as draft.");
-        setConsultationStatus("DRAFT");
+        setFormMessage(consultationId ? (consultationStatus === "FINALIZED" ? "Corrections saved to finalized consultation." : "Consultation draft updated.") : "Consultation saved as draft.");
+        if (consultationStatus !== "FINALIZED") setConsultationStatus("DRAFT");
       }
       await loadAppointments();
     } catch (err) { setFormError(err instanceof Error ? err.message : "Unable to save consultation."); }
@@ -271,14 +317,14 @@ export default function DoctorDashboardPage() {
         </section>
 
         <section className="mb-7 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          <StatCard icon={Users} label="Today's appointments" value={loading ? "—" : appointments.length} helper="Appointments returned by server" />
-          <StatCard icon={Clock3} label="Pending / in progress" value={loading ? "—" : pendingCount} helper="Based on appointment status" />
-          <StatCard icon={CheckCircle2} label="Completed" value={loading ? "—" : completedCount} helper="Marked completed in records" />
+          <StatCard icon={Users} label="Today's OPD" value={loading ? "—" : appointments.length} helper="Click to show all patients" active={statusFilter === "ALL"} onClick={() => setStatusFilter("ALL")} />
+          <StatCard icon={Clock3} label="Pending / in progress" value={loading ? "—" : pendingCount} helper="Click to filter pending patients" active={statusFilter === "PENDING"} onClick={() => setStatusFilter("PENDING")} />
+          <StatCard icon={CheckCircle2} label="Completed" value={loading ? "—" : completedCount} helper="Click to filter completed patients" active={statusFilter === "COMPLETED"} onClick={() => setStatusFilter("COMPLETED")} />
           <StatCard icon={Activity} label="Specialization" value={specialization} helper={doctor?.qualification || "Doctor profile"} compact />
         </section>
 
         <section className="overflow-hidden rounded-2xl border border-[#dceaf1] bg-white shadow-sm">
-          <div className="flex flex-col gap-4 border-b border-[#dceaf1] p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6"><div><h2 className="text-lg font-semibold">Today's appointments</h2><p className="mt-1 text-sm text-slate-500">Search by patient name, phone, UHID, patient ID, or token.</p></div><div className="relative w-full sm:max-w-sm"><Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search today's queue..." className="w-full rounded-xl border border-[#dceaf1] py-3 pl-10 pr-4 text-sm outline-none transition focus:border-[#16587b] focus:ring-4 focus:ring-[#16587b]/10" /></div></div>
+          <div className="flex flex-col gap-4 border-b border-[#dceaf1] p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6"><div><h2 className="text-xl font-bold text-[#123b50]">{statusFilter === "ALL" ? "Today's OPD patients" : statusFilter === "PENDING" ? "Pending / in-progress patients" : "Completed patients"}</h2><p className="mt-1 text-sm text-slate-600">Search by patient name, phone, UHID, patient ID, or token.</p></div><div className="relative w-full sm:max-w-sm"><Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search today's queue..." className="w-full rounded-xl border border-[#dceaf1] py-3 pl-10 pr-4 text-sm outline-none transition focus:border-[#16587b] focus:ring-4 focus:ring-[#16587b]/10" /></div></div>
           {error && <div className="m-5 flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700"><AlertCircle size={18} className="mt-0.5 shrink-0" /><div><p className="font-semibold">Could not load appointments</p><p className="mt-1">{error}</p></div></div>}
           {loading ? <div className="flex items-center justify-center gap-3 px-6 py-16 text-sm text-slate-500"><RefreshCw size={18} className="animate-spin" />Loading today's appointments…</div> : filteredAppointments.length === 0 ? <div className="px-6 py-16 text-center"><div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#eaf3f8] text-[#16587b]"><CalendarDays size={26} /></div><h3 className="font-medium">{query ? "No matching appointments" : "No appointments found for today"}</h3><p className="mt-2 text-sm text-slate-500">{query ? "Try another patient name, phone number, or ID." : "Appointments assigned for today will appear here."}</p></div> : (
             <div className="overflow-x-auto"><table className="w-full min-w-[980px] text-left text-sm"><thead className="bg-[#f7fafc] text-xs uppercase tracking-wide text-slate-500"><tr><th className="px-6 py-4 font-medium">Patient</th><th className="px-6 py-4 font-medium">Token / ID</th><th className="px-6 py-4 font-medium">Appointment time</th><th className="px-6 py-4 font-medium">Status</th><th className="px-6 py-4 text-right font-medium">Actions</th></tr></thead>
@@ -323,8 +369,27 @@ function PatientHistoryView({ history, appointment, onConsult }) {
     <div className="flex flex-col gap-4 rounded-2xl bg-[#f7fafc] p-4 sm:flex-row sm:items-center"><div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#16587b] text-white"><UserRound size={25} /></div><div className="flex-1"><h3 className="text-lg font-semibold">{firstValue(patient.name, patient.fullName, getPatient(appointment).name, appointment.patientName, "Patient")}</h3><p className="mt-1 text-sm text-slate-500">Patient ID: {firstValue(patient.patientId, patient.uhid, patient._id, getPatientId(appointment), "—")}</p></div><button onClick={onConsult} className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#16587b] px-4 py-2.5 text-sm text-white transition hover:bg-[#123b50]"><Stethoscope size={16} />Start consultation</button></div>
     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"><Info label="Phone" value={firstValue(patient.phone, patient.mobile, getPatient(appointment).phone, "Not recorded")} /><Info label="Gender" value={firstValue(patient.gender, "Not recorded")} /><Info label="Date of birth" value={formatDate(patient.dateOfBirth)} /><Info label="Blood group" value={firstValue(patient.bloodGroup, patient.blood_group, "Not recorded")} /><Info label="Address" value={firstValue(patient.address, "Not recorded")} /><Info label="Current appointment" value={firstValue(appointment.status, "Booked").toString().replaceAll("_", " ")} /></div>
     <section className="rounded-2xl border border-[#dceaf1] p-4"><div className="mb-3 flex items-center gap-2"><FileText size={18} className="text-[#16587b]" /><h3 className="font-semibold">Previous consultations</h3></div>
-      {list.length ? <div className="space-y-3">{list.map((record, index) => <div key={record._id || index} className="rounded-xl bg-[#f7fafc] p-4"><div className="flex flex-wrap items-center justify-between gap-2"><p className="font-medium">{(record.diagnosis || []).join(", ") || "Diagnosis not recorded"}</p><span className="text-xs text-slate-500">{formatDate(record.createdAt || record.date)}</span></div>{record.symptoms?.length > 0 && <p className="mt-2 text-sm text-slate-600">Symptoms: {record.symptoms.join(", ")}</p>}{record.advice && <p className="mt-1 text-sm text-slate-600">Advice: {record.advice}</p>}</div>)}</div> : <div className="rounded-xl bg-[#f7fafc] p-4 text-sm text-slate-500">The patient endpoint did not return a previous-consultations list. This area will show records when the backend includes them.</div>}
+      {list.length ? <div className="space-y-3">{list.map((record, index) => <HistoryVisit key={record._id || index} record={record} />)}</div> : <div className="rounded-xl bg-[#f7fafc] p-4 text-sm text-slate-500">The patient endpoint did not return a previous-consultations list. This area will show records when the backend includes them.</div>}
     </section>
+  </div>;
+}
+
+function HistoryVisit({ record }) {
+  const [open, setOpen] = useState(false);
+  const vitals = record.vitals || {};
+  const medicines = Array.isArray(record.medicines) ? record.medicines : [];
+  return <div className="overflow-hidden rounded-xl border border-[#dceaf1] bg-white">
+    <button type="button" onClick={() => setOpen((v) => !v)} className="flex w-full flex-wrap items-center justify-between gap-3 bg-[#edf6fa] p-4 text-left transition hover:bg-[#dceef6]">
+      <div><p className="font-bold text-[#123b50]">{(record.diagnosis || []).join(", ") || "Diagnosis not recorded"}</p><p className="mt-1 text-sm text-slate-600">Visit date: {formatDate(record.createdAt || record.date || record.appointmentId?.appointmentDate)}</p></div><span className="text-sm font-semibold text-[#16587b]">{open ? "Hide details −" : "View visit +"}</span>
+    </button>
+    {open && <div className="space-y-4 p-4">
+      <div><h4 className="mb-2 font-bold text-[#123b50]">Symptoms & examination</h4><p className="text-sm text-slate-700">Symptoms: {(record.symptoms || []).join(", ") || "Not recorded"}</p><p className="mt-1 whitespace-pre-wrap text-sm text-slate-700">Examination: {record.examination || "Not recorded"}</p></div>
+      <div><h4 className="mb-2 font-bold text-[#123b50]">Vitals</h4><div className="grid grid-cols-2 gap-2 sm:grid-cols-5">{[["Temperature", vitals.temperature == null ? "—" : `${vitals.temperature} °F`],["Blood pressure", vitals.bloodPressure || "—"],["Pulse", vitals.pulse == null ? "—" : `${vitals.pulse} bpm`],["SpO₂", vitals.spo2 == null ? "—" : `${vitals.spo2}%`],["Weight", vitals.weight == null ? "—" : `${vitals.weight} kg`]].map(([label,value]) => <Info key={label} label={label} value={value} />)}</div></div>
+      <div><h4 className="mb-2 font-bold text-[#123b50]">Medicines</h4>{medicines.length ? <div className="space-y-2">{medicines.map((m,i) => <div key={m._id || i} className="rounded-lg bg-[#f7fafc] p-3 text-sm"><p className="font-semibold">{m.medicineName} {m.strength || ""}</p><p className="mt-1 text-slate-600">Dose: {m.dose || "—"} · Route: {m.route || "—"} · Frequency: {m.frequency || "—"} · Duration: {m.duration || "—"}</p>{(m.timing || m.instructions) && <p className="mt-1 text-slate-600">{[m.timing,m.instructions].filter(Boolean).join(" · ")}</p>}</div>)}</div> : <p className="text-sm text-slate-500">No medicines recorded.</p>}</div>
+      <div className="grid gap-3 sm:grid-cols-2"><Info label="Tests / investigations" value={(record.tests || []).join(", ") || "Not recorded"} /><Info label="Follow-up" value={formatDate(record.followUpDate)} /></div>
+      <div><h4 className="font-bold text-[#123b50]">Advice</h4><p className="mt-1 whitespace-pre-wrap text-sm text-slate-700">{record.advice || "Not recorded"}</p></div>
+      <p className="text-xs text-slate-500">Record status: {record.status || "Not recorded"}</p>
+    </div>}
   </div>;
 }
 
@@ -334,22 +399,21 @@ function ConsultationForm({ form, updateForm, updateMedicine, addMedicine, remov
     <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-[#f7fafc] p-4"><div><p className="font-medium">{firstValue(patient.name, patient.fullName, appointment.patientName, "Patient")}</p><p className="mt-1 text-xs text-slate-500">Phone: {firstValue(patient.phone, appointment.patientPhone, "Not available")} · Appointment: {formatDate(getAppointmentDate(appointment))}</p></div><span className={`rounded-full px-3 py-1 text-xs font-medium ${completed ? "bg-emerald-50 text-emerald-700" : "bg-blue-50 text-blue-700"}`}>{completed ? "FINALIZED" : status === "DRAFT" ? "DRAFT" : "NEW CONSULTATION"}</span></div>
     {error && <div className="flex items-start gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700"><AlertCircle size={17} className="mt-0.5 shrink-0" />{error}</div>}
     {message && <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800">{message}</div>}
-    {completed && <div className="rounded-xl bg-emerald-50 p-3 text-sm text-emerald-800">This consultation is finalized and read-only.</div>}
-    <fieldset disabled={loading || completed} className="space-y-5 disabled:opacity-80">
+    {completed && <div className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm font-medium text-amber-900">This consultation is finalized. Authorized corrections can be saved; the appointment will remain completed.</div>}
+    <fieldset disabled={loading} className="space-y-5 disabled:opacity-80">
       <FormSection icon={ClipboardList} title="Symptoms and examination"><Field label="Symptoms" hint="Enter one symptom per line" ><textarea value={form.symptomsText} onChange={(e) => updateForm("symptomsText", e.target.value)} rows={3} placeholder="e.g. Fever for 2 days" className={inputClass + " resize-y"} /></Field><Field label="Clinical examination / findings"><textarea value={form.examination} onChange={(e) => updateForm("examination", e.target.value)} rows={3} placeholder="Record examination findings" className={inputClass + " resize-y"} /></Field></FormSection>
       <FormSection icon={HeartPulse} title="Vitals"><div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5"><Field label="Temperature (°F)"><input type="number" step="0.1" value={form.temperature} onChange={(e) => updateForm("temperature", e.target.value)} placeholder="e.g. 98.6" className={inputClass} /></Field><Field label="Blood pressure"><input value={form.bloodPressure} onChange={(e) => updateForm("bloodPressure", e.target.value)} placeholder="120/80" className={inputClass} /></Field><Field label="Pulse (bpm)"><input type="number" value={form.pulse} onChange={(e) => updateForm("pulse", e.target.value)} placeholder="72" className={inputClass} /></Field><Field label="SpO₂ (%)"><input type="number" value={form.spo2} onChange={(e) => updateForm("spo2", e.target.value)} placeholder="98" className={inputClass} /></Field><Field label="Weight (kg)"><input type="number" step="0.1" value={form.weight} onChange={(e) => updateForm("weight", e.target.value)} placeholder="70" className={inputClass} /></Field></div></FormSection>
       <FormSection icon={ClipboardCheck} title="Diagnosis and tests"><Field label="Diagnosis" hint="Enter one diagnosis per line"><textarea value={form.diagnosisText} onChange={(e) => updateForm("diagnosisText", e.target.value)} rows={3} placeholder="Enter diagnosis after clinical assessment" className={inputClass + " resize-y"} /></Field><Field label="Tests / investigations" hint="Enter one test per line"><textarea value={form.testsText} onChange={(e) => updateForm("testsText", e.target.value)} rows={2} placeholder="Tests, if clinically indicated" className={inputClass + " resize-y"} /></Field></FormSection>
       <FormSection icon={Pill} title="Prescription"><div className="space-y-3">{form.medicines.map((medicine, index) => <div key={index} className="rounded-xl border border-[#dceaf1] p-3 sm:p-4"><div className="mb-3 flex items-center justify-between"><p className="text-sm font-medium">Medicine {index + 1}</p>{form.medicines.length > 1 && <button type="button" onClick={() => removeMedicine(index)} className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-red-600 transition hover:bg-red-50"><Trash2 size={14} />Remove</button>}</div><div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"><Field label="Medicine name"><input value={medicine.medicineName} onChange={(e) => updateMedicine(index, "medicineName", e.target.value)} placeholder="Medicine name" className={inputClass} /></Field><Field label="Strength"><input value={medicine.strength} onChange={(e) => updateMedicine(index, "strength", e.target.value)} placeholder="e.g. 500 mg" className={inputClass} /></Field><Field label="Dose"><input value={medicine.dose} onChange={(e) => updateMedicine(index, "dose", e.target.value)} placeholder="e.g. 1 tablet" className={inputClass} /></Field><Field label="Route"><select value={medicine.route} onChange={(e) => updateMedicine(index, "route", e.target.value)} className={inputClass}><option>Oral</option><option>Topical</option><option>Injection</option><option>Inhalation</option><option>Other</option></select></Field><Field label="Frequency"><input value={medicine.frequency} onChange={(e) => updateMedicine(index, "frequency", e.target.value)} placeholder="e.g. twice daily" className={inputClass} /></Field><Field label="Duration"><input value={medicine.duration} onChange={(e) => updateMedicine(index, "duration", e.target.value)} placeholder="e.g. 5 days" className={inputClass} /></Field><Field label="Timing"><input value={medicine.timing} onChange={(e) => updateMedicine(index, "timing", e.target.value)} placeholder="e.g. after food" className={inputClass} /></Field><Field label="Instructions"><input value={medicine.instructions} onChange={(e) => updateMedicine(index, "instructions", e.target.value)} placeholder="Additional instructions" className={inputClass} /></Field></div></div>)}<button type="button" onClick={addMedicine} className="inline-flex items-center gap-2 rounded-lg border border-[#dceaf1] px-3 py-2 text-sm text-[#16587b] transition hover:border-[#16587b] hover:bg-[#eaf3f8]"><Plus size={15} />Add medicine</button></div></FormSection>
       <FormSection icon={CalendarClock} title="Advice and follow-up"><Field label="Advice / instructions"><textarea value={form.advice} onChange={(e) => updateForm("advice", e.target.value)} rows={3} placeholder="Doctor's advice and patient instructions" className={inputClass + " resize-y"} /></Field><Field label="Follow-up date"><input type="date" value={form.followUpDate} onChange={(e) => updateForm("followUpDate", e.target.value)} className={inputClass} /></Field></FormSection>
     </fieldset>
-    {!completed && <div className="sticky bottom-0 flex flex-col-reverse gap-2 border-t border-[#dceaf1] bg-white pt-4 sm:flex-row sm:justify-end"><button type="button" disabled={loading} onClick={onSave} className="inline-flex items-center justify-center gap-2 rounded-xl border border-[#dceaf1] px-4 py-2.5 text-sm text-[#16587b] transition hover:bg-[#f7fafc] disabled:opacity-60"><Save size={16} />{loading ? "Saving…" : "Save as draft"}</button><button type="button" disabled={loading} onClick={onFinalize} className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#16587b] px-4 py-2.5 text-sm text-white transition hover:bg-[#123b50] disabled:opacity-60"><CheckCircle2 size={16} />{loading ? "Please wait…" : "Save & finalize"}</button></div>}
-    <p className="text-xs leading-5 text-slate-400">Enter only clinically verified findings and prescriptions. Finalizing marks the appointment completed and prevents further draft edits.</p>
+    <div className="sticky bottom-0 flex flex-col-reverse gap-2 border-t border-[#dceaf1] bg-white pt-4 sm:flex-row sm:justify-end"><button type="button" disabled={loading} onClick={onSave} className="inline-flex items-center justify-center gap-2 rounded-xl border border-[#dceaf1] px-4 py-2.5 text-sm font-semibold text-[#16587b] transition hover:bg-[#f7fafc] disabled:opacity-60"><Save size={16} />{loading ? "Saving…" : completed ? "Save corrections" : "Save as draft"}</button>{!completed && <button type="button" disabled={loading} onClick={onFinalize} className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#16587b] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#123b50] disabled:opacity-60"><CheckCircle2 size={16} />{loading ? "Please wait…" : "Save & finalize"}</button>}</div>
+    <p className="text-xs leading-5 text-slate-400">Enter only clinically verified findings and prescriptions. Finalizing marks the appointment completed. Corrections to finalized records should be limited to authorized clinical staff.</p>
   </div>;
 }
 
 const inputClass = "w-full rounded-xl border border-[#dceaf1] bg-white px-3 py-2.5 text-sm text-[#123b50] outline-none transition placeholder:text-slate-400 hover:border-[#b6d2e0] focus:border-[#16587b] focus:ring-4 focus:ring-[#16587b]/10 disabled:bg-slate-50";
 function Field({ label, hint, children }) { return <label className="block min-w-0"><span className="mb-1.5 block text-xs font-medium text-slate-600">{label}</span>{children}{hint && <span className="mt-1 block text-[11px] text-slate-400">{hint}</span>}</label>; }
 function FormSection({ icon: Icon, title, children }) { return <section className="rounded-2xl border border-[#dceaf1] p-4 sm:p-5"><div className="mb-4 flex items-center gap-2"><span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#eaf3f8] text-[#16587b]"><Icon size={17} /></span><h3 className="font-semibold">{title}</h3></div>{children}</section>; }
-function StatCard({ icon: Icon, label, value, helper, compact = false }) { return <div className="rounded-2xl border border-[#dceaf1] bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"><div className="flex items-start justify-between gap-3"><div className="min-w-0"><p className="text-sm text-slate-500">{label}</p><p className={`mt-2 truncate font-semibold text-[#123b50] ${compact ? "text-lg" : "text-3xl"}`}>{value}</p></div><div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#eaf3f8] text-[#16587b]"><Icon size={21} /></div></div><p className="mt-2 text-xs text-slate-400">{helper}</p></div>; }
+function StatCard({ icon: Icon, label, value, helper, compact = false, active = false, onClick }) { const content = <><div className="flex items-start justify-between gap-3"><div className="min-w-0"><p className="text-sm font-semibold text-slate-600">{label}</p><p className={`mt-2 truncate font-bold text-[#123b50] ${compact ? "text-lg" : "text-3xl"}`}>{value}</p></div><div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${active ? "bg-[#16587b] text-white" : "bg-[#eaf3f8] text-[#16587b]"}`}><Icon size={21} /></div></div><p className="mt-2 text-xs text-slate-500">{helper}</p></>; return onClick ? <button type="button" onClick={onClick} className={`w-full rounded-2xl border p-5 text-left shadow-sm transition hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-[#16587b]/15 ${active ? "border-[#16587b] bg-[#edf6fa] ring-1 ring-[#16587b]" : "border-[#dceaf1] bg-white hover:border-[#16587b]"}`}>{content}</button> : <div className="rounded-2xl border border-[#dceaf1] bg-white p-5 shadow-sm">{content}</div>; }
 function Info({ label, value }) { return <div className="rounded-xl border border-[#dceaf1] p-3"><p className="text-xs text-slate-500">{label}</p><p className="mt-1 break-words text-sm font-medium text-[#123b50]">{String(value)}</p></div>; }
-  
