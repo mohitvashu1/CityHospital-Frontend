@@ -17,7 +17,7 @@ import {
 const roles = [
   {
     id: "SUPER_ADMIN",
-    title: "Management",
+    title: "ADMIN",
     description: "Manage hospital operations and staff",
     icon: ShieldCheck,
     color: "text-red-700",
@@ -95,6 +95,11 @@ export default function AdminPage() {
   }
 
   function handleRoleClick(roleId) {
+     if (roleId === "SUPER_ADMIN") {
+    router.push("/admin/super-admin/login");
+    return;
+  }
+  
     if (roleId === "DOCTOR") {
       router.push("/doctor/login");
       return;
