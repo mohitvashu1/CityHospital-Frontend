@@ -70,11 +70,13 @@ export default function DoctorLoginPage() {
 
       // Use sessionStorage to match the current app's tab-session auth flow.
       // Never persist the password or other credentials.
+        // Save the authenticated doctor session.
       sessionStorage.setItem("doctorToken", data.token);
       sessionStorage.setItem("doctorUser", JSON.stringify(data.user));
       sessionStorage.setItem("doctor", JSON.stringify(data.doctor));
 
-      router.replace("/doctor/dashboard");
+      // Redirect to the Doctor Dashboard.
+      router.replace("/admin/doctor/dashboard");
     } catch (err) {
       setError(
         err instanceof Error

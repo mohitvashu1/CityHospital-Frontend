@@ -101,7 +101,7 @@ export default function AdminPage() {
   }
   
     if (roleId === "DOCTOR") {
-      router.push("/doctor/login");
+      router.push("admin/doctor/login");
       return;
     }
 

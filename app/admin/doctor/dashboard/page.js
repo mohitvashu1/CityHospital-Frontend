@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import {
   Activity, CalendarDays, CheckCircle2, Clock3, FileText, LogOut,
   RefreshCw, Search, Stethoscope, UserRound, Users, X, AlertCircle,
@@ -219,7 +220,7 @@ export default function DoctorDashboardPage() {
   }
 
   function logout() {
-    sessionStorage.removeItem("doctorToken"); sessionStorage.removeItem("doctorUser"); sessionStorage.removeItem("doctor"); router.replace("/doctor/login");
+    sessionStorage.removeItem("doctorToken"); sessionStorage.removeItem("doctorUser"); sessionStorage.removeItem("doctor"); router.replace("/");
   }
 
   function updateForm(key, value) { setForm((current) => ({ ...current, [key]: value })); }
@@ -302,7 +303,16 @@ export default function DoctorDashboardPage() {
     <main className="min-h-screen bg-[#f7fafc] text-[#123b50]">
       <header className="sticky top-0 z-20 border-b border-[#dceaf1] bg-white/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-3"><div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#16587b] text-white"><Stethoscope size={23} /></div><div><p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#a9002d]">City Hospital · Buxar</p><p className="font-semibold">Doctor Portal</p></div></div>
+          <div className="flex min-w-0 items-center">
+            <Image
+              src="/logo.png"
+              alt="City Hospital"
+              width={220}
+              height={65}
+              priority
+              className="h-12 w-auto max-w-[190px] object-contain sm:h-14 sm:max-w-[220px]"
+            />
+          </div>
           <div className="flex items-center gap-2">
             <button onClick={loadAppointments} disabled={loading} className="inline-flex items-center gap-2 rounded-xl border border-[#dceaf1] px-3 py-2 text-sm transition hover:border-[#16587b] hover:bg-[#eaf3f8] disabled:opacity-60"><RefreshCw size={16} className={loading ? "animate-spin" : ""} /><span className="hidden sm:inline">Refresh</span></button>
             <button onClick={logout} className="inline-flex items-center gap-2 rounded-xl border border-red-100 px-3 py-2 text-sm text-red-700 transition hover:bg-red-50"><LogOut size={16} /><span className="hidden sm:inline">Logout</span></button>
