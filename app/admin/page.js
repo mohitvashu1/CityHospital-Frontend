@@ -1,345 +1,152 @@
 
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
 import {
   ShieldCheck,
   Stethoscope,
-  ClipboardList,
-  ArrowLeft,
-  LockKeyhole,
-  UserRound,
-  Eye,
-  EyeOff,
+  Users,
+  ArrowRight,
+  Building2,
 } from "lucide-react";
 
-const roles = [
+const portals = [
   {
-    id: "SUPER_ADMIN",
-    title: "ADMIN",
-    description: "Manage hospital operations and staff",
+    title: "Super Admin",
+    subtitle: "Hospital administration",
+    description:
+      "Manage doctors, staff accounts, patients, appointments and hospital operations.",
+    href: "/admin/super-admin/login",
     icon: ShieldCheck,
-    color: "text-red-700",
-    bg: "bg-red-50",
-    permissions: [
-      "Manage doctors",
-      "Manage staff",
-      "Change / reset passwords of all users",
-      "Manage user roles and access",
-      "Manage medicines",
-      "Manage tests",
-      "View reports",
-      "Manage hospital settings",
-    ],
+    label: "ADMINISTRATION",
   },
   {
-    id: "DOCTOR",
-    title: "Doctor",
-    description: "Patient consultations and prescriptions",
+    title: "Doctor Portal",
+    subtitle: "Clinical workspace",
+    description:
+      "Review today's OPD, access patient history and manage consultations and prescriptions.",
+    href: "/admin/doctor/login",
     icon: Stethoscope,
-    color: "text-blue-700",
-    bg: "bg-blue-50",
-    permissions: [
-      "View assigned appointments",
-      "View patient history",
-      "Add diagnosis",
-      "Add investigations",
-      "Add medicines and advice",
-      "Create prescriptions",
-    ],
+    label: "CLINICAL ACCESS",
   },
   {
-    id: "RECEPTIONIST",
-    title: "Receptionist/Staff",
-    description: "Patient registration and appointment desk",
-    icon: ClipboardList,
-    color: "text-green-700",
-    bg: "bg-green-50",
-    permissions: [
-      "Register patients",
-      "Book appointments",
-      "View basic patient information",
-      "Print finalized prescriptions",
-    ],
+    title: "Staff Portal",
+    subtitle: "Hospital operations",
+    description:
+      "Handle reception workflows, patient registration and appointment queues.",
+    href: "/admin/staff/login",
+    icon: Users,
+    label: "STAFF ACCESS",
   },
 ];
 
 export default function AdminPage() {
-  const router = useRouter();
-
-  const [selectedRole, setSelectedRole] = useState(null);
-  const [userId, setUserId] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [message, setMessage] = useState("");
-
-  const selected = roles.find(
-    (role) => role.id === selectedRole
-  );
-
-  function handleLogin(e) {
-    e.preventDefault();
-
-    setMessage(
-      "Login is not connected yet. Backend authentication will be added later."
-    );
-  }
-
-  function chooseRole(roleId) {
-    setSelectedRole(roleId);
-    setMessage("");
-    setUserId("");
-    setPassword("");
-    setShowPassword(false);
-  }
-
-  function handleRoleClick(roleId) {
-     if (roleId === "SUPER_ADMIN") {
-    router.push("/admin/super-admin/login");
-    return;
-  }
-  
-    if (roleId === "DOCTOR") {
-      router.push("admin/doctor/login");
-      return;
-    }
-
-    chooseRole(roleId);
-  }
-
   return (
-    <main className="min-h-screen bg-[#f7fafc] px-4 py-12">
-      <div className="mx-auto w-full max-w-5xl">
-        {/* Header */}
-        <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#16587b] text-white shadow-lg">
-            <ShieldCheck size={34} />
+    <main className="min-h-screen bg-[#f7fafc] text-[#123b50]">
+      
+
+      {/* Main content */}
+      <section className="mx-auto max-w-7xl px-5 pb-12 pt-12 sm:px-8 sm:pb-16 sm:pt-16">
+        {/* Page heading */}
+        <div className="mx-auto mb-10 max-w-2xl text-center sm:mb-12">
+          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl border border-[#dceaf1] bg-white text-[#16587b]">
+            <Building2 size={24} strokeWidth={1.7} />
           </div>
 
-          <p className="mb-2 text-sm font-semibold uppercase tracking-[0.2em] text-[#a9002d]">
-            City Hospital
+          <p className="text-xs font-medium uppercase tracking-[0.16em] text-[#a9002d]">
+            City Hospital · Buxar
           </p>
 
-          <h1 className="text-3xl font-bold text-[#123b50] sm:text-4xl">
-            Staff &amp; Admin Portal
+          <h1 className="mt-3 text-3xl font-semibold tracking-tight text-[#123b50] sm:text-4xl">
+            Hospital Management Portal
           </h1>
 
-          <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-gray-600 sm:text-base">
-            Select your portal to securely access your hospital workspace.
+          <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-slate-600 sm:text-base">
+            Choose your portal to access hospital services and management
+            tools. Your account permissions determine which features are
+            available to you.
           </p>
         </div>
 
-        {/* Role Selection */}
-        {!selectedRole ? (
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {roles.map((role) => {
-              const Icon = role.icon;
+        {/* Portal cards */}
+        <div className="mx-auto grid max-w-6xl gap-5 md:grid-cols-2 xl:grid-cols-3">
+          {portals.map((portal) => {
+            const Icon = portal.icon;
 
-              return (
-                <button
-                  key={role.id}
-                  type="button"
-                  onClick={() => handleRoleClick(role.id)}
-                  className="group rounded-2xl border border-[#dceaf1] bg-white p-6 text-left shadow-sm transition duration-300 hover:-translate-y-1 hover:border-[#16587b] hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[#16587b]"
-                >
-                  <div
-                    className={`mb-5 flex h-14 w-14 items-center justify-center rounded-xl ${role.bg} ${role.color}`}
-                  >
-                    <Icon size={28} />
-                  </div>
-
-                  <h2 className="text-xl font-bold text-[#123b50]">
-                    {role.title}
-                  </h2>
-
-                  <p className="mt-2 min-h-12 text-sm leading-6 text-gray-600">
-                    {role.description}
-                  </p>
-
-                  <div className="mt-5 flex items-center justify-between border-t border-[#dceaf1] pt-4">
-                    <span className="text-sm font-semibold text-[#16587b]">
-                      Continue to login
-                    </span>
-
-                    <span className="text-xl text-[#16587b] transition group-hover:translate-x-1">
-                      →
-                    </span>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="mx-auto grid max-w-4xl overflow-hidden rounded-2xl border border-[#dceaf1] bg-white shadow-xl md:grid-cols-2">
-            {/* Portal Information */}
-            <section className="bg-[#16587b] p-7 text-white sm:p-9">
-              <button
-                type="button"
-                onClick={() => {
-                  setSelectedRole(null);
-                  setMessage("");
-                }}
-                className="mb-10 inline-flex items-center gap-2 text-sm text-white/80 transition hover:text-white"
+            return (
+              <article
+                key={portal.title}
+                className="group flex min-h-[320px] flex-col rounded-xl border border-[#dceaf1] bg-white p-6 transition duration-200 hover:-translate-y-1 hover:border-[#84b3ce] hover:shadow-lg hover:shadow-[#16587b]/5 sm:p-7"
               >
-                <ArrowLeft size={17} />
-                Change portal
-              </button>
+                <div className="flex items-start justify-between">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#eaf3f8] text-[#16587b] transition-colors group-hover:bg-[#16587b] group-hover:text-white">
+                    <Icon size={23} strokeWidth={1.7} />
+                  </div>
 
-              <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-2xl bg-white/15">
-                {selected &&
-                  (() => {
-                    const Icon = selected.icon;
-                    return <Icon size={32} />;
-                  })()}
-              </div>
+                  <span className="rounded-md border border-[#dceaf1] bg-[#f7fafc] px-2.5 py-1 text-[11px] font-medium text-[#16587b]">
+                    Secure portal
+                  </span>
+                </div>
 
-              <p className="text-sm font-medium uppercase tracking-widest text-white/70">
-                City Hospital
-              </p>
-
-              <h2 className="mt-2 text-3xl font-bold">
-                {selected?.title} Login
-              </h2>
-
-              <p className="mt-3 text-sm leading-6 text-white/80">
-                Sign in with your authorized account to access your portal.
-              </p>
-
-              <div className="mt-9 border-t border-white/20 pt-6">
-                <h3 className="mb-4 font-semibold">
-                  Portal access
-                </h3>
-
-                <ul className="space-y-3">
-                  {selected?.permissions.map((permission) => (
-                    <li
-                      key={permission}
-                      className="flex items-start gap-2 text-sm text-white/85"
-                    >
-                      <span className="mt-0.5">✓</span>
-                      <span>{permission}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </section>
-
-            {/* Login Form */}
-            <section className="p-7 sm:p-9">
-              <div className="mb-7">
-                <h3 className="text-2xl font-bold text-[#123b50]">
-                  Welcome back
-                </h3>
-
-                <p className="mt-2 text-sm text-gray-600">
-                  Enter your credentials to continue.
+                <p className="mt-7 text-[11px] font-medium tracking-[0.12em] text-[#a9002d]">
+                  {portal.label}
                 </p>
-              </div>
 
-              <form onSubmit={handleLogin} className="space-y-5">
-                <div>
-                  <label
-                    htmlFor="userId"
-                    className="mb-2 block text-sm font-semibold text-[#123b50]"
-                  >
-                    User ID / Email / Phone
-                  </label>
+                <h2 className="mt-2 text-xl font-medium tracking-tight text-[#123b50]">
+                  {portal.title}
+                </h2>
 
-                  <div className="relative">
-                    <UserRound
-                      size={18}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                    />
+                <p className="mt-1 text-sm text-[#16587b]">
+                  {portal.subtitle}
+                </p>
 
-                    <input
-                      id="userId"
-                      type="text"
-                      value={userId}
-                      onChange={(e) => setUserId(e.target.value)}
-                      placeholder="Enter your login ID"
-                      autoComplete="username"
-                      required
-                      className="w-full rounded-xl border border-[#dceaf1] py-3 pl-10 pr-4 text-sm text-[#123b50] outline-none transition focus:border-[#16587b] focus:ring-2 focus:ring-[#16587b]/15"
-                    />
-                  </div>
-                </div>
+                <p className="mt-4 flex-1 text-sm leading-6 text-slate-600">
+                  {portal.description}
+                </p>
 
-                <div>
-                  <label
-                    htmlFor="password"
-                    className="mb-2 block text-sm font-semibold text-[#123b50]"
-                  >
-                    Password
-                  </label>
-
-                  <div className="relative">
-                    <LockKeyhole
-                      size={18}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
-                    />
-
-                    <input
-                      id="password"
-                      type={showPassword ? "text" : "password"}
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Enter your password"
-                      autoComplete="current-password"
-                      required
-                      className="w-full rounded-xl border border-[#dceaf1] py-3 pl-10 pr-12 text-sm text-[#123b50] outline-none transition focus:border-[#16587b] focus:ring-2 focus:ring-[#16587b]/15"
-                    />
-
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setShowPassword((prev) => !prev)
-                      }
-                      aria-label={
-                        showPassword ? "Hide password" : "Show password"
-                      }
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-[#16587b]"
-                    >
-                      {showPassword ? (
-                        <EyeOff size={18} />
-                      ) : (
-                        <Eye size={18} />
-                      )}
-                    </button>
-                  </div>
-                </div>
-
-                {message && (
-                  <p
-                    role="status"
-                    className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800"
-                  >
-                    {message}
-                  </p>
-                )}
-
-                <button
-                  type="submit"
-                  className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#16587b] px-5 py-3.5 font-semibold text-white transition hover:bg-[#123b50] focus:outline-none focus:ring-2 focus:ring-[#16587b] focus:ring-offset-2"
+                <Link
+                  href={portal.href}
+                  className="mt-6 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-[#16587b] bg-[#16587b] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:border-[#123b50] hover:bg-[#123b50] focus:outline-none focus:ring-4 focus:ring-[#16587b]/15"
                 >
-                  Secure Login
-                  <span>→</span>
-                </button>
-              </form>
+                  Continue to login
+                  <ArrowRight
+                    size={16}
+                    strokeWidth={1.8}
+                    className="transition-transform group-hover:translate-x-0.5"
+                  />
+                </Link>
+              </article>
+            );
+          })}
+        </div>
 
-              <p className="mt-6 text-center text-xs leading-5 text-gray-500">
-                Authorized hospital staff only. Your access will be verified
-                by the server.
-              </p>
-            </section>
+        {/* Security notice */}
+        <div className="mx-auto mt-8 flex max-w-6xl items-start gap-3 rounded-xl border border-[#dceaf1] bg-white p-4 sm:p-5">
+          <ShieldCheck
+            size={20}
+            strokeWidth={1.7}
+            className="mt-0.5 shrink-0 text-[#16587b]"
+          />
+
+          <div>
+            <h3 className="text-sm font-medium text-[#123b50]">
+              Secure hospital access
+            </h3>
+
+            <p className="mt-1 text-sm leading-6 text-slate-600">
+              Sign in using the credentials issued by hospital management.
+              Access to patient records and administrative functions is
+              controlled by your account permissions.
+            </p>
           </div>
-        )}
+        </div>
 
-        {/* Footer */}
-        <p className="mt-8 text-center text-xs text-gray-500">
-          © {new Date().getFullYear()} City Hospital. All rights reserved.
-        </p>
-      </div>
+        <footer className="mt-10 text-center text-xs text-slate-500">
+          © {new Date().getFullYear()} City Hospital, Buxar, Bihar. All rights
+          reserved.
+        </footer>
+      </section>
     </main>
   );
 }

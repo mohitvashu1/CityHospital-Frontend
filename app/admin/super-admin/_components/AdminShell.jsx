@@ -119,11 +119,11 @@ export default function AdminShell({
           {/* Admin Details and Logout */}
           <div className="flex items-center gap-3">
             <div className="hidden text-right sm:block">
-              <p className="text-sm font-bold text-[#123b50]">
+              <p className="text-lg font-bold text-[#123b50]">
                 {admin?.name || "City Hospital Admin"}
               </p>
 
-              <p className="text-xs font-semibold text-[#a9002d]">
+              <p className="text-sm font-semibold text-[#a9002d]">
                 SUPER ADMIN
               </p>
             </div>
@@ -131,8 +131,7 @@ export default function AdminShell({
             <button
               type="button"
               onClick={logout}
-              className="inline-flex items-center gap-2 rounded-md border-2 border-[#a9002d] bg-white px-3 py-2 text-sm font-bold text-[#a9002d] transition hover:bg-[#a9002d] hover:text-white"
-            >
+className="inline-flex items-center gap-3 rounded-md border-2 border-[#16587b] bg-[#16587b] px-3 py-2 text-sm font-bold text-white transition hover:border-[#123b50] hover:bg-[#123b50]"            >
               <LogOut size={16} />
               Logout
             </button>
