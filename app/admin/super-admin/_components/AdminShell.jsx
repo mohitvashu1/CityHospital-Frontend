@@ -96,10 +96,10 @@ export default function AdminShell({
   }
 
   return (
-    <main className="min-h-screen bg-[#f5f8fa] text-[#123b50]">
+    <main className="min-h-screen bg-[#f7fafc] text-[#123b50]">
       {/* Top Header */}
-      <header className="border-b-2 border-[#a9002d] bg-white">
-        <div className="mx-auto flex min-h-[80px] max-w-[1440px] flex-wrap items-center justify-between gap-4 px-4 py-3 sm:px-7">
+      <header className="border-b border-[#dceaf1] bg-white">
+        <div className="mx-auto flex min-h-[76px] max-w-[1440px] flex-wrap items-center justify-between gap-4 px-4 py-3 sm:px-7">
           {/* Real Hospital Logo */}
           <Link
             href="/admin/super-admin/dashboard"
@@ -119,11 +119,11 @@ export default function AdminShell({
           {/* Admin Details and Logout */}
           <div className="flex items-center gap-3">
             <div className="hidden text-right sm:block">
-              <p className="text-lg font-bold text-[#123b50]">
+              <p className="text-base font-medium text-[#123b50]">
                 {admin?.name || "City Hospital Admin"}
               </p>
 
-              <p className="text-sm font-semibold text-[#a9002d]">
+              <p className="text-xs font-medium tracking-wide text-[#a9002d]">
                 SUPER ADMIN
               </p>
             </div>
@@ -131,7 +131,7 @@ export default function AdminShell({
             <button
               type="button"
               onClick={logout}
-className="inline-flex items-center gap-3 rounded-md border-2 border-[#16587b] bg-[#16587b] px-3 py-2 text-sm font-bold text-white transition hover:border-[#123b50] hover:bg-[#123b50]"            >
+className="inline-flex items-center gap-2 rounded-lg border border-[#16587b] bg-[#16587b] px-3.5 py-2.5 text-sm font-medium text-white transition hover:border-[#123b50] hover:bg-[#123b50]"            >
               <LogOut size={16} />
               Logout
             </button>
@@ -142,8 +142,8 @@ className="inline-flex items-center gap-3 rounded-md border-2 border-[#16587b] b
       {/* Dashboard Layout */}
       <div className="mx-auto grid max-w-[1440px] gap-5 px-4 py-5 sm:px-7 lg:grid-cols-[245px_minmax(0,1fr)]">
         {/* Sidebar */}
-        <aside className="h-fit rounded-lg border-2 border-[#d7e2e8] bg-white p-3 shadow-sm">
-          <p className="mb-2 px-3 py-2 text-xs font-extrabold uppercase tracking-widest text-[#a9002d]">
+        <aside className="h-fit rounded-xl border border-[#dceaf1] bg-white p-3 shadow-sm">
+          <p className="mb-2 px-3 py-2 text-[13px] font-medium uppercase tracking-[0.14em] text-[#0a1a64]">
             Hospital Management
           </p>
 
@@ -160,8 +160,8 @@ className="inline-flex items-center gap-3 rounded-md border-2 border-[#16587b] b
                   href={href}
                   className={`flex items-center justify-between rounded-md border px-3 py-3 text-sm font-bold transition ${
                     active
-                      ? "border-[#a9002d] bg-[#fff1f4] text-[#a9002d]"
-                      : "border-transparent text-[#254a5d] hover:border-[#d7e2e8] hover:bg-[#f5f8fa]"
+                      ? "border-[#dceaf1] bg-[#eaf3f8] text-[#16587b]"
+                      : "border-transparent text-[#526b79] hover:border-[#dceaf1] hover:bg-[#f7fafc] hover:text-[#16587b]"
                   }`}
                 >
                   <span className="flex items-center gap-3">
@@ -176,8 +176,8 @@ className="inline-flex items-center gap-3 rounded-md border-2 border-[#16587b] b
           </nav>
 
           {/* Security Notice */}
-          <div className="mt-5 rounded-md border border-[#d7e2e8] bg-[#f7fafc] p-3">
-            <p className="flex items-center gap-2 text-xs font-extrabold uppercase text-[#16587b]">
+          <div className="mt-5 rounded-lg border border-[#dceaf1] bg-[#f7fafc] p-3">
+            <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-wide text-[#16587b]">
               <Activity size={15} />
               Secure Workspace
             </p>
@@ -191,18 +191,18 @@ className="inline-flex items-center gap-3 rounded-md border-2 border-[#16587b] b
 
         {/* Main Content */}
         <section className="min-w-0">
-          <div className="mb-5 flex flex-wrap items-end justify-between gap-3 border-b-2 border-[#a9002d] pb-4">
+          <div className="mb-5 flex flex-wrap items-end justify-between gap-3 border-b border-[#dceaf1] pb-5">
             <div>
-              <p className="mb-1 text-xs font-extrabold uppercase tracking-[.16em] text-[#a9002d]">
+              <p className="mb-1 text-[11px] font-medium uppercase tracking-[.15em] text-[#a9002d]">
                 City Hospital / Admin
               </p>
 
-              <h1 className="text-2xl font-extrabold text-[#123b50] sm:text-3xl">
+              <h1 className="text-2xl font-medium tracking-tight text-[#123b50] sm:text-3xl">
                 {title}
               </h1>
 
               {subtitle && (
-                <p className="mt-1 text-sm font-medium text-[#526b79]">
+                <p className="mt-1 text-sm leading-6 text-[#526b79]">
                   {subtitle}
                 </p>
               )}
@@ -216,7 +216,7 @@ className="inline-flex items-center gap-3 rounded-md border-2 border-[#16587b] b
       </div>
 
       {/* Footer */}
-      <footer className="border-t border-[#d7e2e8] bg-white px-4 py-4 text-center text-xs font-semibold text-gray-500">
+      <footer className="border-t border-[#dceaf1] bg-white px-4 py-4 text-center text-xs text-gray-500">
         City Hospital, Buxar · Administration Portal
       </footer>
     </main>
@@ -232,11 +232,11 @@ export function Panel({
 }) {
   return (
     <section
-      className={`rounded-lg border-2 border-[#d7e2e8] bg-white shadow-sm ${className}`}
+      className={`rounded-xl border border-[#dceaf1] bg-white shadow-sm ${className}`}
     >
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#d7e2e8] px-4 py-4 sm:px-5">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#dceaf1] px-4 py-4 sm:px-5">
         <div>
-          <h2 className="text-lg font-extrabold text-[#a9002d]">
+          <h2 className="text-base font-medium text-[#123b50]">
             {title}
           </h2>
 
@@ -259,7 +259,7 @@ export function Alert({ error, notice }) {
       {error && (
         <div
           role="alert"
-          className="mb-4 rounded-md border-2 border-red-300 bg-red-50 px-4 py-3 text-sm font-bold text-red-800"
+          className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
         >
           {error}
         </div>
@@ -268,7 +268,7 @@ export function Alert({ error, notice }) {
       {notice && (
         <div
           role="status"
-          className="mb-4 rounded-md border-2 border-green-300 bg-green-50 px-4 py-3 text-sm font-bold text-green-800"
+          className="mb-4 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800"
         >
           {notice}
         </div>
@@ -278,13 +278,13 @@ export function Alert({ error, notice }) {
 }
 
 export const fieldClass =
-  "w-full rounded-md border-2 border-[#d7e2e8] bg-white px-3 py-2.5 text-sm text-[#123b50] outline-none focus:border-[#a9002d] focus:ring-2 focus:ring-[#a9002d]/10";
+  "w-full rounded-lg border border-[#dceaf1] bg-white px-3.5 py-2.5 text-sm text-[#123b50] outline-none transition focus:border-[#16587b] focus:ring-4 focus:ring-[#16587b]/10";
 
 export const primaryButton =
-  "inline-flex items-center justify-center gap-2 rounded-md border-2 border-[#a9002d] bg-[#a9002d] px-4 py-2.5 text-sm font-extrabold text-white transition hover:bg-[#870024]";
+  "inline-flex items-center justify-center gap-2 rounded-lg border border-[#16587b] bg-[#16587b] px-4 py-2.5 text-sm font-medium text-white transition hover:border-[#123b50] hover:bg-[#123b50]";
 
 export const secondaryButton =
-  "inline-flex items-center justify-center gap-2 rounded-md border-2 border-[#16587b] bg-white px-4 py-2.5 text-sm font-extrabold text-[#16587b] transition hover:bg-[#edf6fa]";
+  "inline-flex items-center justify-center gap-2 rounded-lg border border-[#dceaf1] bg-white px-4 py-2.5 text-sm font-medium text-[#16587b] transition hover:border-[#84b3ce] hover:bg-[#eaf3f8]";
 
 export function Table({
   columns,
@@ -293,14 +293,14 @@ export function Table({
   onRowClick,
 }) {
   return (
-    <div className="overflow-x-auto rounded-md border border-[#d7e2e8]">
+    <div className="overflow-x-auto rounded-lg border border-[#dceaf1]">
       <table className="w-full min-w-[640px] border-collapse text-left text-sm">
-        <thead className="bg-[#fff1f4]">
+        <thead className="bg-[#f4f8fb]">
           <tr>
             {columns.map((column) => (
               <th
                 key={column.key}
-                className="border-b-2 border-[#a9002d] px-4 py-3 text-xs font-extrabold uppercase tracking-wide text-[#a9002d]"
+                className="border-b border-[#dceaf1] px-4 py-3 text-[11px] font-medium uppercase tracking-[0.08em] text-[#526b79]"
               >
                 {column.label}
               </th>
@@ -313,16 +313,16 @@ export function Table({
             <tr
               key={row._id || row.id || index}
               onClick={onRowClick ? () => onRowClick(row) : undefined}
-              className={`border-b border-[#e3ebef] last:border-0 ${
+              className={`border-b border-[#edf2f5] last:border-0 ${
                 onRowClick
-                  ? "cursor-pointer hover:bg-[#fff8f9]"
+                  ? "cursor-pointer hover:bg-[#f7fafc]"
                   : ""
               }`}
             >
               {columns.map((column) => (
                 <td
                   key={column.key}
-                  className="px-4 py-3.5 font-medium text-[#254a5d]"
+                  className="px-4 py-3.5 font-normal text-[#254a5d]"
                 >
                   {column.render
                     ? column.render(row)
@@ -336,7 +336,7 @@ export function Table({
             <tr>
               <td
                 colSpan={columns.length}
-                className="px-4 py-10 text-center font-semibold text-gray-500"
+                className="px-4 py-10 text-center text-sm text-gray-500"
               >
                 {empty}
               </td>
