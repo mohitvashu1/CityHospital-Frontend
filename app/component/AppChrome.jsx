@@ -14,8 +14,10 @@ export default function AppChrome({ children }) {
   // Show the normal Navbar on this exact login route.
   const isSuperAdminLogin =
     pathname === "/admin/super-admin/login";
-     const isDocLogin =
+  const isDocLogin =
     pathname === "/admin/doctor/login";
+  const isStaffLogin =
+    pathname === "/admin/staff/login";
 
   // Hide the normal Navbar on all other portal pages.
   const isStaffPortal =
@@ -23,7 +25,8 @@ export default function AppChrome({ children }) {
       !isSuperAdminLogin) ||
     (pathname.startsWith("/admin/doctor") &&
       !isDocLogin) ||
-    pathname.startsWith("/staff");
+    (pathname.startsWith("/admin/staff") &&
+      !isStaffLogin ) ;
 
   // Logo-only layout for Super Admin, Doctor and Staff portals.
   if (isStaffPortal) {
