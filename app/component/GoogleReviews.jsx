@@ -92,10 +92,11 @@ const reviews = [
 
 function ReviewCard({ review }) {
   return (
-    <article className="flex h-full flex-col rounded-2xl border border-[#dceaf1] bg-white p-5 shadow-sm sm:p-6">
+    <article className="relative flex h-full flex-col overflow-hidden rounded-3xl border border-[#d5e6ef] bg-white p-5 shadow-[0_10px_30px_rgba(22,88,123,0.10)] transition-all duration-300 hover:-translate-y-1 hover:border-[#84b3ce] hover:shadow-[0_16px_38px_rgba(22,88,123,0.15)] sm:p-6">
+      <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#16587b] via-[#84b3ce] to-[#a9002d]" />
       <div className="flex items-center gap-3">
         <div
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-semibold text-white"
+          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white ring-4 ring-[#eaf4f9] shadow-sm"
           style={{ backgroundColor: review.color }}
         >
           {review.initials}
@@ -108,10 +109,10 @@ function ReviewCard({ review }) {
           <p className="text-sm text-gray-500">{review.count}</p>
         </div>
 
-        <span className="text-xl leading-none text-gray-500">⋮</span>
+        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f3f8fb] text-lg leading-none text-[#6b8797]">⋮</span>
       </div>
 
-      <div className="mt-4 flex flex-wrap items-center gap-2">
+      <div className="mt-5 flex flex-wrap items-center gap-2">
         <div
           className="flex items-center gap-0.5 text-[#fbbc04]"
           aria-label="5 out of 5 stars"
@@ -129,12 +130,12 @@ function ReviewCard({ review }) {
         <span className="text-sm text-gray-500">{review.date}</span>
       </div>
 
-      <p className="mt-3 flex-1 overflow-y-auto whitespace-pre-line text-[15px] leading-6 text-[#30343b]">
+      <p className="mt-4 flex-1 overflow-y-auto whitespace-pre-line border-l-2 border-[#e5eff4] pl-3 text-[15px] leading-6 text-[#344653]">
         {review.text}
       </p>
 
       {review.response && (
-        <div className="mt-3 border-l-2 border-[#dceaf1] pl-3">
+        <div className="mt-3 rounded-r-xl border-l-4 border-[#a9002d] bg-[#fff7f8] px-3 py-2.5">
           <p className="text-sm font-medium text-gray-700">
             Response from the owner
             <span className="ml-2 font-normal text-gray-500">2 years ago</span>
@@ -143,9 +144,11 @@ function ReviewCard({ review }) {
         </div>
       )}
 
-      <div className="mt-4 flex items-center gap-2 text-sm text-gray-600">
-        <ThumbsUp size={17} />
-        <span>{review.likes > 0 ? review.likes : "Like"}</span>
+      <div className="mt-4 flex items-center">
+        <span className="inline-flex items-center gap-2 rounded-full border border-[#dceaf1] bg-[#f7fafc] px-3 py-1.5 text-xs font-medium text-[#527084] transition hover:border-[#84b3ce] hover:bg-[#eaf4f9]">
+          <ThumbsUp size={15} className="text-[#16587b]" />
+          {review.likes > 0 ? `${review.likes} Likes` : "Like"}
+        </span>
       </div>
     </article>
   );
@@ -192,26 +195,26 @@ export default function GoogleReviews() {
   }, []);
 
   return (
-    <section className="bg-[#f7fafc] px-4 py-14 sm:px-6 lg:px-8">
+    <section className="relative overflow-hidden bg-[radial-gradient(circle_at_12%_18%,rgba(132,179,206,0.14),transparent_25%),radial-gradient(circle_at_88%_72%,rgba(169,0,45,0.06),transparent_22%),#f7fafc] px-4 py-14 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-6xl">
-        <div className="mx-auto mb-8 max-w-2xl text-center">
-            <span className="h-[2px] w-8 bg-[#A9002D]" />
-          <span className="text-sm font-semibold uppercase tracking-[0.18em] text-[#16587b]">
-            Patient Testimonials
-          </span>
-          <span className="h-[2px] w-8 bg-[#A9002D]" /> 
+        <div className="mx-auto mb-10 max-w-2xl text-center">
+          <div className="flex flex-col items-center px-4">
+            <span className="text-2xl font-bold uppercase leading-tight tracking-[0.10em] text-[#16587b] sm:text-3xl sm:tracking-[0.18em]">
+              Patient Testimonials
+            </span>
+            <span className="mt-3 h-[3px] w-24 rounded-full bg-[#a9002d] sm:w-32" />
+            <h2 className="mt-7 text-lg font-bold text-[#123b50] sm:mt-8 sm:text-xl">
+              What Our Patients Say
+            </h2>
+          </div>
 
-          <h2 className="mt-2 text-3xl font-bold text-[#123b50] sm:text-4xl">
-            What Our Patients Say
-          </h2>
-
-          <p className="mt-3 text-gray-600">
+          <p className="mt-3 text-sm text-[#5d7180] sm:text-base">
             Experiences shared by patients of City Hospital.
           </p>
 
-          <div className="mt-4 flex items-center justify-center gap-2">
-            <span className="font-semibold text-[#202124]">Google</span>
-            <span>4.9</span>
+          <div className="mx-auto mt-5 inline-flex flex-wrap items-center justify-center gap-2 rounded-full border border-[#dceaf1] bg-white px-4 py-2.5 shadow-[0_4px_14px_rgba(22,88,123,0.06)]">
+            <span className="font-bold text-[#202124]">Google</span>
+            <span className="font-semibold text-[#123b50]">4.9</span>
             <span className="flex items-center gap-0.5 text-[#fbbc04]">
               {Array.from({ length: 5 }).map((_, index) => (
                 <Star
@@ -222,22 +225,22 @@ export default function GoogleReviews() {
                 />
               ))}
             </span>
-            <span> 75 Reviews</span>
+            <span className="text-sm text-[#5d7180]">75 Reviews</span>
           </div>
         </div>
 
-        <div className="mx-auto flex max-w-2xl items-center gap-3 sm:gap-5">
+        <div className="mx-auto flex max-w-6xl items-center gap-3 sm:gap-5">
           <button
             type="button"
             onClick={previousReview}
             aria-label="Previous review"
-            className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#dceaf1] bg-white text-[#16587b] shadow-sm transition hover:bg-[#eaf4f9] sm:flex"
+            className="hidden h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#d5e6ef] bg-white text-[#16587b] shadow-[0_5px_14px_rgba(22,88,123,0.10)] transition duration-200 hover:-translate-y-0.5 hover:border-[#16587b] hover:bg-[#eaf4f9] sm:flex"
           >
             <ChevronUp size={22} />
           </button>
 
           <div
-            className="relative h-[340px] min-w-0 flex-1 overflow-hidden rounded-2xl sm:h-[310px]"
+            className="relative h-[340px] min-w-0 flex-1 overflow-hidden rounded-3xl bg-[#eaf3f8] p-1 sm:h-[310px]"
             onMouseEnter={pauseSlider}
             onMouseLeave={resumeSlider}
             onTouchStart={pauseSlider}
@@ -251,7 +254,7 @@ export default function GoogleReviews() {
             }}
           >
             <div
-              className="absolute inset-x-0 top-0 h-full transition-transform duration-[2000ms] ease-in-out"
+              className="absolute inset-x-1 top-1 h-[calc(100%-0.5rem)] transition-transform duration-[2000ms] ease-in-out"
               style={{ transform: `translateY(-${activeIndex * 100}%)` }}
             >
               {reviews.map((review, index) => (
@@ -266,20 +269,20 @@ export default function GoogleReviews() {
             type="button"
             onClick={nextReview}
             aria-label="Next review"
-            className="hidden h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#dceaf1] bg-white text-[#16587b] shadow-sm transition hover:bg-[#eaf4f9] sm:flex"
+            className="hidden h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[#d5e6ef] bg-white text-[#16587b] shadow-[0_5px_14px_rgba(22,88,123,0.10)] transition duration-200 hover:-translate-y-0.5 hover:border-[#16587b] hover:bg-[#eaf4f9] sm:flex"
           >
             <ChevronDown size={22} />
           </button>
         </div>
 
-        <div className="mt-4 flex justify-center gap-2">
+        <div className="mt-5 flex justify-center gap-2">
           {reviews.map((review, index) => (
             <button
               key={`${review.name}-dot-${index}`}
               type="button"
               aria-label={`Show review ${index + 1}`}
               onClick={() => setActiveIndex(index)}
-              className={`h-2.5 rounded-full transition-all ${
+              className={`h-2.5 rounded-full transition-all duration-300 ${
                 activeIndex === index
                   ? "w-7 bg-[#16587b]"
                   : "w-2.5 bg-[#b7cfdd]"
@@ -288,12 +291,12 @@ export default function GoogleReviews() {
           ))}
         </div>
 
-        <div className="mt-8 text-center">
+        <div className="mt-9 text-center">
           <a
             href={googleReviewsUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 rounded-full border border-[#16587B] px-5 py-2.5 font-medium text-[#16587B] transition-all duration-200 hover:bg-[#16587B] hover:text-white"
+            className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-[#16587b] bg-white px-6 py-3 text-sm font-semibold text-[#16587b] shadow-[0_5px_16px_rgba(22,88,123,0.08)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#16587b] hover:text-white hover:shadow-[0_9px_22px_rgba(22,88,123,0.18)]"
           >
             Read All Reviews on Google
             <ExternalLink size={16} />

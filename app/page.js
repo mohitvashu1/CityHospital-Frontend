@@ -4,6 +4,7 @@ import Doctors from "./component/Doctors";
 import GoogleReviews from "./component/GoogleReviews";
 import Hero from "./component/Hero";
 import HospitalTicker from "./component/HospitalTicker";
+import Location from "./component/Location";
 import MedicalServices from "./component/MedicalServices";
 import QuickInfo from "./component/QuickInfo";
 
@@ -24,15 +25,16 @@ export default function Home() {
         <MedicalServices />
       </section>
 
-      <QuickInfo />
+     
 
       <section id="reviews" className="scroll-mt-24">
         <GoogleReviews />
       </section>
-
-      <section id="contact" className="scroll-mt-24">
+      <Location/>
+        <QuickInfo />
+      {/* <section id="contact" className="scroll-mt-24">
         <ContactStrip />
-      </section>
+      </section> */}
     </main>
   );
 }

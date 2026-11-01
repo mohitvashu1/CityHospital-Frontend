@@ -18,19 +18,10 @@ import {
   FiArrowRight,
   FiShield,
   FiUser,
-  FiLogOut,
-  FiLogIn,
   FiCompass,
 } from "react-icons/fi";
 
 const exploreItems = [
-  {
-    label: "Home",
-    description: "Discover City Hospital",
-    id: "home",
-    icon: FiHome,
-    color: "bg-sky-50 text-sky-700",
-  },
   // All Doctors intentionally hidden.
   // {
   //   label: "All Doctors",
@@ -53,13 +44,6 @@ const exploreItems = [
     icon: FiStar,
     color: "bg-amber-50 text-amber-700",
   },
-  {
-    label: "Contact & Location",
-    description: "Find and contact our hospital",
-    id: "contact",
-    icon: FiPhone,
-    color: "bg-rose-50 text-rose-700",
-  },
 ];
 
 const hospitalAddress =
@@ -74,9 +58,7 @@ export default function Navbar() {
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [exploreOpen, setExploreOpen] = useState(false);
-  const [loginOpen, setLoginOpen] = useState(false);
   const [mobileExploreOpen, setMobileExploreOpen] = useState(false);
-  const [mobileLoginOpen, setMobileLoginOpen] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
 
   useEffect(() => {
@@ -96,19 +78,9 @@ export default function Navbar() {
   function closeMenus() {
     setMenuOpen(false);
     setExploreOpen(false);
-    setLoginOpen(false);
     setMobileExploreOpen(false);
-    setMobileLoginOpen(false);
   }
 
-  function logout() {
-    sessionStorage.removeItem("patientToken");
-    sessionStorage.removeItem("patient");
-    setLoggedIn(false);
-    closeMenus();
-    router.push("/");
-    router.refresh();
-  }
 
   function goHome() {
     closeMenus();
@@ -281,62 +253,12 @@ export default function Navbar() {
             <FiHome size={20} /> Home
           </button>
 
-
-          {!loggedIn ? (
-            <div className="relative">
-              <button
-                type="button"
-                onClick={() => {
-                  setLoginOpen(!loginOpen);
-                  setExploreOpen(false);
-                }}
-                aria-expanded={loginOpen}
-                className={menuToggleClass(loginOpen || pathname === "/patient-login")}
-              >
-                <FiLogIn size={20} /> Login
-                <FiChevronDown
-                  className={`transition-transform ${loginOpen ? "rotate-180" : ""}`}
-                />
-              </button>
-              {loginOpen && (
-                <>
-                  <button
-                    aria-label="Close Login"
-                    className="fixed inset-0 z-40 cursor-default"
-                    onClick={() => setLoginOpen(false)}
-                  />
-                  <div className="absolute left-0 top-[calc(100%+12px)] z-50 w-56 rounded-2xl border border-[#dceaf1] bg-white p-2 shadow-xl">
-                    <Link
-                      href="/patient-login"
-                      onClick={closeMenus}
-                      className="flex items-center gap-3 rounded-xl p-3 text-sm font-semibold text-[#16587b] hover:bg-[#f0f7fa]"
-                    >
-                      <FiUser size={18} /> Patient
-                    </Link>
-                    <Link
-                      href="/admin"
-                      onClick={closeMenus}
-                      className="flex items-center gap-3 rounded-xl p-3 text-sm font-semibold text-[#16587b] hover:bg-[#f0f7fa]"
-                    >
-                      <FiShield size={18} /> Admin
-                    </Link>
-                  </div>
-                </>
-              )}
-            </div>
-          ) : (
-            <button
-              type="button"
-              onClick={logout}
-              className={`${underlineBase} text-[#16587b] after:bg-transparent hover:bg-[#f0f7fa] hover:after:bg-[#a9002d]`}
-            >
-              <FiLogOut size={20} /> Logout
-            </button>
-          )}
-
-
           <Link href="/specialities" className={navLink("/specialities")}>
             <FiActivity size={20} /> Specialities
+          </Link>
+
+          <Link href="/contactus" className={navLink("/contactus")}>
+            <FiPhone size={20} /> Contact us
           </Link>
 
           {/* All Doctors intentionally hidden */}
@@ -346,7 +268,6 @@ export default function Navbar() {
               type="button"
               onClick={() => {
                 setExploreOpen(!exploreOpen);
-                setLoginOpen(false);
               }}
               aria-expanded={exploreOpen}
               className={menuToggleClass(exploreOpen)}
@@ -432,43 +353,12 @@ export default function Navbar() {
               <FiHome size={19} /> Home
             </button>
 
-            {!loggedIn ? (
-              <div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMobileLoginOpen(!mobileLoginOpen);
-                    setMobileExploreOpen(false);
-                  }}
-                  aria-expanded={mobileLoginOpen}
-                  className={`flex w-full items-center justify-between rounded-xl px-3 py-3.5 text-base font-bold transition ${
-                    mobileLoginOpen || pathname === "/patient-login"
-                      ? "bg-[#eaf3f8] text-[#16587b]"
-                      : "text-[#16587b] hover:bg-[#f0f7fa]"
-                  }`}
-                >
-                  <span className="flex items-center gap-3"><FiLogIn size={19} /> Login</span>
-                  <FiChevronDown className={mobileLoginOpen ? "rotate-180" : ""} />
-                </button>
-                {mobileLoginOpen && (
-                  <div className="ml-4 space-y-1 border-l-2 border-[#dceaf1] py-1 pl-3">
-                    <Link href="/patient-login" onClick={closeMenus} className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-semibold text-[#16587b] hover:bg-[#f0f7fa]">
-                      <FiUser size={17} /> Patient
-                    </Link>
-                    <Link href="/admin" onClick={closeMenus} className="flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-semibold text-[#16587b] hover:bg-[#f0f7fa]">
-                      <FiShield size={17} /> Admin
-                    </Link>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <button type="button" onClick={logout} className="flex w-full items-center gap-3 rounded-xl px-3 py-3.5 text-base font-bold text-[#16587b] hover:bg-[#f0f7fa]">
-                <FiLogOut size={19} /> Logout
-              </button>
-            )}
-
             <Link href="/specialities" onClick={closeMenus} className={mobileLink("/specialities")}>
               <FiActivity size={19} /> Specialities
+            </Link>
+
+            <Link href="/contactus" onClick={closeMenus} className={mobileLink("/contactus")}>
+              <FiPhone size={19} /> Contact us
             </Link>
 
             <div>
@@ -476,7 +366,6 @@ export default function Navbar() {
                 type="button"
                 onClick={() => {
                   setMobileExploreOpen(!mobileExploreOpen);
-                  setMobileLoginOpen(false);
                 }}
                 aria-expanded={mobileExploreOpen}
                 className={`flex w-full items-center justify-between rounded-xl px-3 py-3.5 text-base font-bold transition ${

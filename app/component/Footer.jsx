@@ -14,9 +14,9 @@ import {
 const quickLinks = [
   { label: "Home", href: "/" },
   { label: "Our Doctors", href: "/doctors" },
-  { label: "Medical Specialties", href: "/specialties" },
+  { label: "Medical Specialties", href: "/specialities" },
   { label: "Book Appointment", href: "/appointment" },
-  { label: "Contact Us", href: "/contact" },
+  { label: "Contact Us", href: "/contactus" },
 ];
 
 const specialties = [
