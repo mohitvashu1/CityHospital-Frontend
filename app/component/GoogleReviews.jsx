@@ -195,15 +195,15 @@ export default function GoogleReviews() {
   }, []);
 
   return (
-    <section className="relative overflow-hidden bg-[radial-gradient(circle_at_12%_18%,rgba(132,179,206,0.14),transparent_25%),radial-gradient(circle_at_88%_72%,rgba(169,0,45,0.06),transparent_22%),#f7fafc] px-4 py-14 sm:px-6 lg:px-8">
+    <section className="relative overflow-hidden bg-[radial-gradient(circle_at_12%_18%,rgba(132,179,206,0.14),transparent_25%),radial-gradient(circle_at_88%_72%,rgba(169,0,45,0.06),transparent_22%),#f7fafc] px-4 py-10 sm:px-6 sm:py-12 lg:px-8">
       <div className="mx-auto max-w-6xl">
-        <div className="mx-auto mb-10 max-w-2xl text-center">
+        <div className="mx-auto mb-7 max-w-2xl text-center">
           <div className="flex flex-col items-center px-4">
             <span className="text-2xl font-bold uppercase leading-tight tracking-[0.10em] text-[#16587b] sm:text-3xl sm:tracking-[0.18em]">
               Patient Testimonials
             </span>
             <span className="mt-3 h-[3px] w-24 rounded-full bg-[#a9002d] sm:w-32" />
-            <h2 className="mt-7 text-lg font-bold text-[#123b50] sm:mt-8 sm:text-xl">
+            <h2 className="mt-5 text-lg font-bold text-[#123b50] sm:mt-6 sm:text-xl">
               What Our Patients Say
             </h2>
           </div>
@@ -291,7 +291,7 @@ export default function GoogleReviews() {
           ))}
         </div>
 
-        <div className="mt-9 text-center">
+        <div className="mt-7 text-center">
           <a
             href={googleReviewsUrl}
             target="_blank"

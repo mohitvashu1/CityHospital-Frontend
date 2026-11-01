@@ -64,7 +64,7 @@ export default function Doctors() {
   };
 
   return (
-    <section className="overflow-hidden bg-white py-16 sm:py-20 lg:py-24">
+    <section className="overflow-hidden bg-white py-10 sm:py-14 lg:py-16">
       <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-10">
 
         {/* Header */}
@@ -89,7 +89,7 @@ export default function Doctors() {
         </div>
 
         {/* Doctor Slider */}
-        <div className="relative mt-10 sm:mt-12">
+        <div className="relative mt-8 sm:mt-10">
 
           {/* Mobile / Tablet Previous */}
           <button
@@ -180,7 +180,7 @@ export default function Doctors() {
         </div>
 
         {/* View All */}
-        <div className="mt-8 flex justify-center">
+        <div className="mt-6 flex justify-center">
           <Link
             href="/doctors"
             className="inline-flex items-center gap-2 rounded-xl border border-[#16587B] bg-white px-6 py-3 text-sm font-semibold text-[#16587B] transition hover:bg-[#16587B] hover:text-white"

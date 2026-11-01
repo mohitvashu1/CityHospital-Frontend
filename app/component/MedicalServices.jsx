@@ -20,7 +20,7 @@ export default function MedicalServices() {
   };
 
   return (
-    <section id="specialities" className="w-full bg-[#f7fafc] py-16 md:py-20">
+    <section id="specialities" className="w-full bg-[#f7fafc] py-10 md:py-14">
       <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-8 flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
           <div className="max-w-2xl">

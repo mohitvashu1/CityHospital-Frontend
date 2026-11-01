@@ -27,7 +27,7 @@ export default function Location() {
     <section
       id="location"
       aria-labelledby="location-heading"
-      className="relative isolate overflow-hidden bg-[#F7FAFC] py-14 sm:py-16 lg:py-20"
+      className="relative isolate overflow-hidden bg-[#F7FAFC] py-10 sm:py-12 lg:py-14"
     >
       {/* Soft decorative background accents */}
       <div
@@ -41,7 +41,7 @@ export default function Location() {
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section heading */}
-        <div className="mx-auto mb-9 max-w-2xl text-center sm:mb-12">
+        <div className="mx-auto mb-7 max-w-2xl text-center sm:mb-9">
           <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[#dceaf1] bg-white px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-[#16587b] shadow-sm">
             <MapPin size={14} className="text-[#A9002D]" />
             Visit Us
