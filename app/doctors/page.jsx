@@ -1,56 +1,45 @@
 
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Search, X, ArrowRight, CalendarDays, Stethoscope, Users, HeartPulse } from "lucide-react";
 
-const doctors = [
-  {
-    id: 1,
-    name: "Dr. P.C. Rai",
-    qualification: "M.B.B.S., M.D. (General Medicine), CPCDM",
-    specialty: "General Medicine",
-    description:
-      "Focused on diagnosis, treatment and ongoing care for a wide range of medical conditions.",
-    image: "/doctors/dr-pc-rai1.png",
-    tags: ["General Medicine", "Diabetes Care", "Internal Medicine"],
-  },
-  {
-    id: 2,
-    name: "Dr. Rashmi Rai",
-    qualification: "M.S. (Obstetrics & Gynecology)",
-    specialty: "Gynecology",
-    description:
-      "Providing care for women's health, pregnancy, maternity and fertility-related concerns.",
-    image: "/doctors/dr-rashmi-rai.jpeg",
-    tags: ["Gynecology", "Maternity Care", "Infertility"],
-  },
-  {
-    id: 3,
-    name: "Dr. Abhishek Kumar",
-    qualification: "M.B.B.S., M.S. (General Physician)",
-    specialty: "General Physician",
-    description:
-      "Providing general medical consultation, health assessment and patient-focused care.",
-    image: "/doctors/dr-abhishek-kumar.png",
-    tags: ["General Physician", "General Medicine"],
-  },
-];
-
-const specialties = [
-  "All Doctors",
-  "General Medicine",
-  "Gynecology",
-  "General Physician",
-  "Infertility",
-  "Maternity Care",
-  "Diabetes Care",
-];
+const API_URL = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000").replace(/\/$/, "");
 
 export default function DoctorsPage() {
   const [search, setSearch] = useState("");
   const [activeSpecialty, setActiveSpecialty] = useState("All Doctors");
+  const [doctors, setDoctors] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState("");
+
+  useEffect(() => {
+    let mounted = true;
+    fetch(`${API_URL}/api/doctors`, { cache: "no-store" })
+      .then((response) => {
+        if (!response.ok) throw new Error("Unable to load doctor profiles.");
+        return response.json();
+      })
+      .then((data) => {
+        if (mounted) setDoctors(data.doctors || []);
+      })
+      .catch((error) => {
+        if (mounted) setLoadError(error.message);
+      })
+      .finally(() => {
+        if (mounted) setLoading(false);
+      });
+    return () => { mounted = false; };
+  }, []);
+
+  const specialties = useMemo(() => {
+    const values = doctors.flatMap((doctor) => [
+      doctor.specialization,
+      ...(Array.isArray(doctor.tags) ? doctor.tags : []),
+    ]).filter(Boolean);
+    return ["All Doctors", ...new Set(values)];
+  }, [doctors]);
 
   const filteredDoctors = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -59,9 +48,9 @@ export default function DoctorsPage() {
       const searchableText = [
         doctor.name,
         doctor.qualification,
-        doctor.specialty,
+        doctor.specialization,
         doctor.description,
-        ...doctor.tags,
+        ...(Array.isArray(doctor.tags) ? doctor.tags : []),
       ]
         .join(" ")
         .toLowerCase();
@@ -70,14 +59,14 @@ export default function DoctorsPage() {
 
       const matchesSpecialty =
         activeSpecialty === "All Doctors" ||
-        doctor.tags.some(
+        (doctor.tags || []).some(
           (tag) => tag.toLowerCase() === activeSpecialty.toLowerCase()
         ) ||
-        doctor.specialty.toLowerCase() === activeSpecialty.toLowerCase();
+        (doctor.specialization || "").toLowerCase() === activeSpecialty.toLowerCase();
 
       return matchesSearch && matchesSpecialty;
     });
-  }, [search, activeSpecialty]);
+  }, [doctors, search, activeSpecialty]);
 
   const clearFilters = () => {
     setSearch("");
@@ -212,21 +201,30 @@ export default function DoctorsPage() {
           )}
         </div>
 
-        {filteredDoctors.length > 0 ? (
+        {loading ? (
+          <div className="rounded-2xl border border-[#dceaf1] bg-white px-5 py-14 text-center text-sm text-slate-500">
+            Loading doctor profiles...
+          </div>
+        ) : loadError ? (
+          <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 px-5 py-8 text-center text-sm text-red-700">
+            {loadError}
+          </div>
+        ) : filteredDoctors.length > 0 ? (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {filteredDoctors.map((doctor) => (
               <article
-                key={doctor.id}
+                key={doctor._id}
                 className="group flex h-full flex-col overflow-hidden rounded-2xl border border-[#dceaf1] bg-white transition duration-300 hover:-translate-y-1 hover:border-[#84b3ce] hover:shadow-[0_16px_40px_rgba(18,59,80,0.10)]"
               >
                 <div className="relative flex h-64 items-end justify-center overflow-hidden bg-[#eaf3f8] sm:h-72">
                   <div className="absolute left-4 top-4 z-10 rounded-full border border-white/70 bg-white/90 px-3 py-1.5 text-xs font-semibold text-[#16587b] shadow-sm">
-                    {doctor.specialty}
+                    {doctor.specialization}
                   </div>
 
                   <img
-                    src={doctor.image}
+                    src={doctor.image || "/hero-doctor.png"}
                     alt={doctor.name}
+                    onError={(event) => { event.currentTarget.src = "/hero-doctor.png"; }}
                     className="h-full w-full object-contain object-bottom transition duration-500 group-hover:scale-[1.03]"
                   />
                 </div>

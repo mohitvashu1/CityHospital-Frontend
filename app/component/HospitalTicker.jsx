@@ -9,10 +9,10 @@ const tickerItems = [
     icon: Phone,
     content: (
       <a
-        href="tel:+917061848401"
+        href="tel:+916183359844"
         className="font-medium text-white/90 transition hover:text-[#84b3ce]"
       >
-        +91 7061848401
+        +91 6183359844
       </a>
     ),
   },
