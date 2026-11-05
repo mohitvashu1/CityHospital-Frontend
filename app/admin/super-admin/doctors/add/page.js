@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import ImageUpload from "../../_components/ImageUpload";
 import AdminShell, {
   adminFetch,
   Alert,
@@ -35,7 +36,6 @@ const fields = [
   ["registrationNumber", "Medical registration number", "text", true],
   ["phone", "Mobile number", "tel", false],
   ["department", "Department", "text", false],
-  ["image", "Profile image path or URL", "text", false],
   ["experience", "Experience / role label", "text", false],
 ];
 
@@ -98,11 +98,11 @@ export default function AddDoctorPage() {
                 type={type}
                 required={required}
                 minLength={key === "password" ? 12 : undefined}
-                maxLength={key === "password" ? 128 : key === "image" ? 500 : 254}
+                maxLength={key === "password" ? 128 : 254}
                 className={`${fieldClass} mt-2`}
                 value={form[key]}
                 onChange={(event) => update(key, event.target.value)}
-                placeholder={key === "image" ? "/doctors/doctor-name.jpg or https://..." : ""}
+                
               />
             </label>
           ))}
@@ -131,6 +131,8 @@ export default function AddDoctorPage() {
               Up to 12 tags. These help patients filter doctors by specialty.
             </span>
           </label>
+
+          <ImageUpload value={form.image} onChange={(image) => update("image", image)} folder="doctors" label="Doctor profile image" />
 
           {form.image && (
             <div className="sm:col-span-2">
